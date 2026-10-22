@@ -10,6 +10,10 @@ Three AI research assistants for recruiters, and a desktop app that runs them:
 
 The assistants are independent Claude Code projects. Each keeps its own memory database and keys on the person's computer. The Excel results stay on the computer too (`Documents/RecruitDesk-Data`, one folder per assistant). The company database holds only people, the company, each person's allowance, the search history, the last record and admin-only logs.
 
+## Install
+
+See [`INSTALL.md`](INSTALL.md) for installing on Windows and Linux, the first start, and the one-time company setup.
+
 ## Run and build
 
 - Each assistant: `cd <assistant> && claude`, then follow its `CLAUDE.md` and `README.md`. Copy `.env.example` to `.env` and add your own keys (Exa, and Apollo for accounts). Keys are never committed.
