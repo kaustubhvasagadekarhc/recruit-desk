@@ -142,7 +142,7 @@
 
   <main id="main" tabindex="-1">
     <div id="update-banner" class="update-banner hidden" role="status">
-      <span id="update-text"></span>
+      <span><span id="update-text"></span> <strong id="update-count"></strong></span>
       <button type="button" id="update-install" class="primary">Update and restart</button>
       <button type="button" id="update-later">Later</button>
     </div>
@@ -466,6 +466,8 @@
             <h2>About Recruit Desk</h2>
             <p class="about-version" id="about-version"></p>
             <p class="update-row"><button type="button" id="update-check">Check for updates</button> <span class="hint" id="update-line" role="status"></span></p>
+            <p class="update-row"><label class="check-row"><input type="checkbox" id="update-auto"> Install updates automatically</label></p>
+            <p class="hint">A new version is installed on its own when no assistant is running and nothing is typed into a run form. You see a 15 second countdown first and can press Later.</p>
             <p><strong>Built by kaustubh.s.v</strong></p>
             <p class="muted">Three AI research assistants for recruiters: one finds candidates for a job, one checks a company's open jobs, and one researches a company as an account (what it builds, offices, funding, leaders and open engineering roles, each with a source). Results are saved to Excel files that this app shows but never changes.</p>
             <details>

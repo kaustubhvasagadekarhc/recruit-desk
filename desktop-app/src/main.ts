@@ -2459,8 +2459,45 @@ async function syncHistory() {
 interface UpdateInfo { available: boolean; version: string; notes: string; message: string }
 let updateOffered = "";
 let updateDismissed = "";
+let pendingUpdate: UpdateInfo | null = null;
+let autoFailed = "";   // a version whose automatic install failed: not retried by itself, the person can press the button
+let autoTimer: number | undefined;
+const AUTO_UPDATE_SECONDS = 15;
+
+// A new version installs on its own, but only at a quiet moment: no assistant running and nothing typed into a run form. A countdown is
+// shown first and "Later" cancels it. The person can switch it off in About (kept in this window's storage, on by default).
+const autoUpdateOn = () => { try { return localStorage.getItem("rd-auto-update") !== "off"; } catch { return true; } };
+const setAutoUpdate = (on: boolean) => { try { localStorage.setItem("rd-auto-update", on ? "on" : "off"); } catch { /* the choice is then not remembered */ } };
+
+function quietForUpdate(): boolean {
+  if (AGENT_KEYS.some((k) => views[k].running)) return false;
+  return AGENT_KEYS.every((k) => Object.values(views[k].getInput()).every((v) => typeof v !== "string" || v.trim() === ""));
+}
+
+function cancelAutoInstall() {
+  if (autoTimer !== undefined) { clearTimeout(autoTimer); autoTimer = undefined; }
+  $("#update-count").textContent = "";
+}
+
+function maybeAutoInstall() {
+  const u = pendingUpdate;
+  if (!u?.available || !autoUpdateOn() || autoTimer !== undefined || u.version === updateDismissed || u.version === autoFailed) return;
+  if (!quietForUpdate()) return;   // looked at again a minute later
+  let left = AUTO_UPDATE_SECONDS;
+  const tick = () => {
+    autoTimer = undefined;
+    if (!quietForUpdate() || u.version === updateDismissed) { $("#update-count").textContent = ""; return; }   // work started: it waits
+    if (left <= 0) { $("#update-count").textContent = ""; void installUpdate(); return; }
+    $("#update-count").textContent = `Installing in ${left} ${left === 1 ? "second" : "seconds"}.`;
+    left -= 1;
+    autoTimer = window.setTimeout(tick, 1000);
+  };
+  tick();
+}
 
 function showUpdate(u: UpdateInfo | null) {
+  pendingUpdate = u?.available ? u : null;
+  if (!u?.available) cancelAutoInstall();
   const banner = $("#update-banner");
   const show = !!u?.available && u.version !== updateDismissed;
   banner.classList.toggle("hidden", !show);
@@ -2471,6 +2508,7 @@ function showUpdate(u: UpdateInfo | null) {
   const busy = AGENT_KEYS.some((k) => views[k].running);
   $<HTMLButtonElement>("#update-install").disabled = busy;
   $<HTMLButtonElement>("#update-install").title = busy ? "Update when the assistant has finished." : "";
+  maybeAutoInstall();
 }
 
 async function checkUpdate(manual: boolean) {
@@ -2479,16 +2517,17 @@ async function checkUpdate(manual: boolean) {
   try {
     const u = await invoke<UpdateInfo>("update_check");
     showUpdate(u);
-    if (manual) { updateDismissed = ""; showUpdate(u); line.textContent = u.available ? `Version ${u.version} is available.` : u.message; }
+    if (manual) { updateDismissed = ""; autoFailed = ""; showUpdate(u); line.textContent = u.available ? `Version ${u.version} is available.` : u.message; }
   } catch (e) { if (manual) line.textContent = plainError(e); }
 }
 
 async function installUpdate() {
   const b = $<HTMLButtonElement>("#update-install");
   b.disabled = true;
+  cancelAutoInstall();
   $("#update-text").textContent = "Downloading the update. Recruit Desk restarts when it is installed…";
   try { await invoke("update_install"); }
-  catch (e) { toastError(e); showUpdate({ available: true, version: updateOffered, notes: "", message: "" }); }
+  catch (e) { autoFailed = updateOffered; toastError(e); showUpdate({ available: true, version: updateOffered, notes: "", message: "" }); }
 }
 
 // ---------- live updates ----------
@@ -2654,12 +2693,16 @@ async function main() {
   });
   $("#update-check").addEventListener("click", () => void checkUpdate(true));
   $("#update-install").addEventListener("click", () => void installUpdate());
-  $("#update-later").addEventListener("click", () => { updateDismissed = updateOffered; $("#update-banner").classList.add("hidden"); });
+  $("#update-later").addEventListener("click", () => { updateDismissed = updateOffered; cancelAutoInstall(); $("#update-banner").classList.add("hidden"); });
+  const auto = $<HTMLInputElement>("#update-auto");
+  auto.checked = autoUpdateOn();
+  auto.addEventListener("change", () => { setAutoUpdate(auto.checked); if (auto.checked) maybeAutoInstall(); else cancelAutoInstall(); });
+  setInterval(maybeAutoInstall, 60_000);   // an update that waited for a quiet moment is tried again every minute
   setTimeout(() => void checkUpdate(false), 5_000);
   setInterval(() => void liveTick(), LIVE_MS);
   document.addEventListener("visibilitychange", () => { if (!document.hidden) void liveTick(true); });
   window.addEventListener("focus", () => void liveTick(true));
-  setInterval(() => void checkUpdate(false), 6 * 3_600_000);
+  setInterval(() => void checkUpdate(false), 3_600_000);
   await loadSettings();
   show(lastView());
   await refreshStatus();

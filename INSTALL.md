@@ -70,7 +70,7 @@ Admins also see **History** (everyone's searches), **People** (invite people, ch
 
 ## Updating, repairing and uninstalling
 
-- **Windows update:** when a newer signed release is published, the app shows "Version X is available" with "Update and restart". Nothing downloads without your click, and nothing installs while an assistant is running. You can also run a newer installer by hand. It replaces only the app and the assistants' code, never your keys, databases, workbooks or runs.
+- **Windows update:** the app checks for a newer signed release at start-up and every hour. At a quiet moment (no assistant running, nothing typed into a run form) it shows "Version X is available. Installing in 15 seconds", then installs and restarts by itself. Press "Later" to cancel, or switch it off in About ("Install updates automatically"). You can also press "Update and restart" at once, or run a newer installer by hand. It replaces only the app and the assistants' code, never your keys, databases, workbooks or runs.
 - **Uninstall:** it removes the app and leaves the assistants folder and `RecruitDesk-Data` in place, and tells you where they are. Delete them yourself if you no longer want them.
 - **If something looks stuck:** the app waits at most 8 seconds for the system keychain and then keeps the sign-in in memory for that session. If the sign-in ended, sign in again. If "Prepare now" is offered, press it. The setup screen shows what is missing.
 

@@ -82,6 +82,37 @@ for (const dark of [false, true]) {
   ok(`[${t}] admin: signing out empties the card`, (await p.locator("#stored-box").innerHTML()) === "");
   await p.close();
 
+  // automatic install: a countdown at a quiet moment, cancelled by Later, blocked by typed work or by the switch in About
+  p = await page("s=idle&view=candidate&auth=in&upd=new", dark);
+  await p.waitForTimeout(5800);
+  ok(`[${t}] auto update: at a quiet moment a countdown starts`, /^Installing in \d+ seconds?\.$/.test(await txt(p, "#update-count")) && (await txt(p, "#update-text")).startsWith("Version 0.2.0 is available."), await txt(p, "#update-count"));
+  await p.waitForTimeout(16000);
+  ok(`[${t}] auto update: when it runs out the update is installed`, (await p.evaluate(() => window.__mock.counts.update_install || 0)) === 1);
+  await p.close();
+  p = await page("s=idle&view=candidate&auth=in&upd=new", dark);
+  await p.waitForTimeout(6500);
+  await p.click("#update-later");
+  await p.waitForTimeout(16000);
+  ok(`[${t}] auto update: "Later" cancels the countdown and nothing is installed`, (await p.evaluate(() => window.__mock.counts.update_install || 0)) === 0 && (await txt(p, "#update-count")) === "" && !(await vis(p, "#update-banner")));
+  await p.close();
+  p = await page("s=idle&view=candidate&auth=in&upd=new", dark);
+  await p.fill("#jd-input", "Senior React developer, Pune");
+  await p.waitForTimeout(6500);
+  ok(`[${t}] auto update: work typed into a run form holds the countdown back, and the banner still offers the button`, (await txt(p, "#update-count")) === "" && (await vis(p, "#update-banner")) && (await p.evaluate(() => window.__mock.counts.update_install || 0)) === 0);
+  await p.fill("#jd-input", "");
+  await p.waitForTimeout(62000);
+  ok(`[${t}] auto update: once the form is empty it is tried again within a minute`, /^Installing in \d+ seconds?\.$/.test(await txt(p, "#update-count")), await txt(p, "#update-count"));
+  await p.close();
+  p = await page("s=idle&view=candidate&auth=in&upd=new", dark);
+  await openSettings(p);
+  ok(`[${t}] auto update: the switch in About is on by default and says what it does`, await p.locator("#update-auto").isChecked() && (await txt(p, "#view-settings")).includes("15 second countdown"));
+  await p.locator("#update-auto").uncheck();
+  await p.waitForTimeout(500);
+  ok(`[${t}] auto update: switched off, no countdown starts`, (await txt(p, "#update-count")) === "" && (await p.evaluate(() => localStorage.getItem("rd-auto-update"))) === "off");
+  await p.waitForTimeout(16000);
+  ok(`[${t}] auto update: switched off, nothing is installed by itself`, (await p.evaluate(() => window.__mock.counts.update_install || 0)) === 0 && (await vis(p, "#update-banner")));
+  await p.close();
+
   // updates: offered, postponed, installed on a click, checked by hand
   p = await page("s=idle&view=candidate&auth=in&upd=new", dark);
   await p.waitForTimeout(5600);

@@ -576,3 +576,6 @@ button.src-ref:hover:not(:disabled) { border-color: var(--accent); background: v
 .logs-table td { vertical-align: top; }
 .logs-table .lg-msg { overflow-wrap: anywhere; }
 .logs-table .lg-time { white-space: nowrap; font-variant-numeric: tabular-nums; color: var(--muted); }
+
+.check-row { display: flex; align-items: center; gap: 8px; }
+.update-banner strong { font-variant-numeric: tabular-nums; }
