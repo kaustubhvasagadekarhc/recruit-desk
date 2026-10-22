@@ -315,28 +315,9 @@ export function userActions(u: AdminUser, company = "your company"): UserAction[
 
 export interface InviteResult { email: string; role: string; expires_at: string; code: string }
 
-/** Where a new person gets the Windows installer: the same address always names the newest release (the release carries an unversioned copy). */
-export const DOWNLOAD_URL = "https://github.com/kaustubhvasagadekarhc/recruit-desk/releases/latest/download/Recruit-Desk-Setup.exe";
-
-/** What to tell the admin after creating an invitation. The app writes the email; the admin sends it from their own mail program. */
+/** What to tell the admin after creating an invitation (nothing is emailed: the admin hands the code over). */
 export function inviteResultText(r: InviteResult, nowMs: number): string {
-  return `Press "Email the invitation" to open a ready-written email to ${r.email} in your mail program, or copy the message and send it yourself. It holds the invitation id and the download link. The code works once, only for that address, and ends ${expiresText(r.expires_at, nowMs)}.`;
-}
-
-/** The email an admin sends to someone they invited: the invitation id and the link to the newest installer. */
-export function inviteEmail(company: string, adminEmail: string, r: InviteResult, nowMs: number): { to: string; subject: string; body: string } {
-  const body = [
-    "Hello,",
-    "",
-    `${adminEmail} invited you to join ${company} on Recruit Desk.`,
-    "",
-    `Invitation id: ${r.code}`,
-    "",
-    `Download the app (Windows): ${DOWNLOAD_URL}`,
-    "",
-    `Then start Recruit Desk, choose "I have an invitation code", and enter this email address (${r.email}), the invitation id above and a password of your own. The invitation works once, only for this address, and ends ${expiresText(r.expires_at, nowMs)}.`,
-  ].join("\n");
-  return { to: r.email, subject: `You are invited to join ${company} on Recruit Desk`, body };
+  return `Give this code to ${r.email}. In Recruit Desk they choose "I have an invitation code", use exactly this email address, this code and a password of their own. It works once, only for that address, and ends ${expiresText(r.expires_at, nowMs)}. No email is sent.`;
 }
 
 export const looksLikeCode = (s: string) => /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(s.trim());

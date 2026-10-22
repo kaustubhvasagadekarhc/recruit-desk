@@ -2,7 +2,7 @@
 // Recruit Desk front end. Plain TypeScript, no framework; talks to the Rust side
 // through window.__TAURI__ (withGlobalTauri is on in tauri.conf.json).
 
-import { cleanLine, expiresText, formatUtc, inviteEmail, inviteResultText, isSignInRequired, LINK_TEXT, looksLikeCode, loginNotice, recordsLine, recordSummary, AGENT_LABEL, allowanceInput, allowanceIntro, assistantName, historyIntro, historyLine, offlineText, removeSearchText, resultsText, searchSummary, sharedNote, statusLabel, windowText, passwordProblem, plainResult, roleLabel, signInSummary, userActions, validEmail, type AdminInvite, type AdminUser, type AgentKey, type AuthStatusLike, type InviteResult, type HistoryResult, type HistoryRow, type HistorySearch, type LinkField, type LinkMode, type RecordsResult, type StoredRecord, type UserAction } from "./plain.js";
+import { cleanLine, expiresText, formatUtc, inviteResultText, isSignInRequired, LINK_TEXT, looksLikeCode, loginNotice, recordsLine, recordSummary, AGENT_LABEL, allowanceInput, allowanceIntro, assistantName, historyIntro, historyLine, offlineText, removeSearchText, resultsText, searchSummary, sharedNote, statusLabel, windowText, passwordProblem, plainResult, roleLabel, signInSummary, userActions, validEmail, type AdminInvite, type AdminUser, type AgentKey, type AuthStatusLike, type InviteResult, type HistoryResult, type HistoryRow, type HistorySearch, type LinkField, type LinkMode, type RecordsResult, type StoredRecord, type UserAction } from "./plain.js";
 import { CARD_COLUMNS, DEV_COLUMNS, FILTERS, SIDE_SHEETS, VIEWS, ageText, cell, compareCells, enumValues, evidenceFor, h1bFor, intText, keyFacts, listSheets, passesFilters, viewsIn, salaryText, scoreBreakdown, sourceMap, splitList, usdShort, type EvidenceItem } from "./data.js";
 
 interface Status {
@@ -2143,7 +2143,6 @@ function adminError(text: string) {
 }
 
 function closeLink() {
-  linkMail = null;
   $("#link-box").classList.add("hidden");
   $<HTMLInputElement>("#link-url").value = "";
 }
@@ -2156,12 +2155,7 @@ function clearAdmin() {
   adminError("");
 }
 
-let linkMail: { to: string; subject: string; body: string } | null = null;
-
-function showLink(title: string, text: string, url: string, warn: string, mail: { to: string; subject: string; body: string } | null = null) {
-  linkMail = mail;
-  $("#link-mail-row").classList.toggle("hidden", !mail);
-  $("#link-mail-error").classList.add("hidden");
+function showLink(title: string, text: string, url: string, warn: string) {
   $("#link-title").textContent = title;
   $("#link-text").textContent = text;
   $("#link-warn").textContent = warn;
@@ -2232,8 +2226,7 @@ function renderInvites(invites: AdminInvite[]) {
 
 function showInvite(i: { email: string; role: string; expires_at: string; code?: string; id?: string }) {
   const r: InviteResult = { email: i.email, role: i.role, expires_at: i.expires_at, code: i.code ?? i.id ?? "" };
-  showLink(`Invitation code for ${r.email}`, inviteResultText(r, Date.now()), r.code, `Anyone who signs up with ${r.email} and this code joins ${company()} as ${roleLabel(r.role).toLowerCase()}. Send it only to ${r.email}.`,
-    inviteEmail(company(), auth.user?.email ?? "Your admin", r, Date.now()));
+  showLink(`Invitation code for ${r.email}`, inviteResultText(r, Date.now()), r.code, `Anyone who signs up with ${r.email} and this code joins ${company()} as ${roleLabel(r.role).toLowerCase()}. Hand it over privately.`);
 }
 
 async function loadAdmin(announce = false, keepError = false) {
@@ -2291,18 +2284,6 @@ function wireAdmin() {
   $("#invite-form").addEventListener("submit", submitInvite);
   $("#admin-refresh").addEventListener("click", () => void loadAdmin(true));
   $("#link-close").addEventListener("click", closeLink);
-  $("#link-mail").addEventListener("click", async () => {
-    if (!linkMail) return;
-    const err = $("#link-mail-error");
-    err.classList.add("hidden");
-    try { await invoke("open_mail", { to: linkMail.to, subject: linkMail.subject, body: linkMail.body }); toast("Your mail program opened with the invitation. Press Send there.", "ok"); }
-    catch (e) { err.textContent = `${plainError(e)} Use "Copy the message" and send it yourself.`; err.classList.remove("hidden"); }
-  });
-  $("#link-copy-msg").addEventListener("click", async () => {
-    if (!linkMail) return;
-    const text = `To: ${linkMail.to}\nSubject: ${linkMail.subject}\n\n${linkMail.body}`;
-    if (await copyText(text)) toast("Message copied.", "ok"); else toast("Could not copy. Use Email the invitation instead.", "error");
-  });
   $("#link-copy").addEventListener("click", async () => {
     const url = $<HTMLInputElement>("#link-url").value;
     if (await copyText(url)) toast("Code copied.", "ok"); else { $<HTMLInputElement>("#link-url").select(); toast("Could not copy. Select the code and copy it.", "error"); }

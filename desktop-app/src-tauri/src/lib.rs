@@ -445,33 +445,6 @@ fn open_url(app: tauri::AppHandle, url: String) -> Result<(), String> {
     app.opener().open_url(u, None::<&str>).map_err(|e| e.to_string())
 }
 
-/// A percent-encoded piece of a mailto: address (letters, digits and - . _ ~ stay; a line break becomes CRLF as mail programs expect).
-fn mail_encode(s: &str) -> String {
-    s.replace("\r\n", "\n").split('\n').map(|line| line.bytes().map(|b| if b.is_ascii_alphanumeric() || b"-._~".contains(&b) { (b as char).to_string() } else { format!("%{b:02X}") }).collect::<String>()).collect::<Vec<_>>().join("%0D%0A")
-}
-
-/// The address a ready-written email opens with, or why it cannot be made (a short check on the address and the lengths).
-pub fn mailto(to: &str, subject: &str, body: &str) -> Result<String, String> {
-    let to = to.trim();
-    let ok = to.len() <= 254 && to.matches('@').count() == 1 && !to.starts_with('@') && !to.ends_with('@') && to.rsplit('@').next().map(|d| d.contains('.')).unwrap_or(false)
-        && to.chars().all(|c| c.is_ascii_graphic() && !",;<>\"()[]\\%?&=#".contains(c));
-    if !ok {
-        return Err("That does not look like an email address.".into());
-    }
-    if subject.chars().count() > 200 || body.chars().count() > 1800 {
-        return Err("The message is too long for a ready-written email.".into());
-    }
-    Ok(format!("mailto:{to}?subject={}&body={}", mail_encode(subject), mail_encode(body)))
-}
-
-/// Open the person's own mail program with a ready-written email (nothing is sent from here: they press Send).
-#[tauri::command]
-fn open_mail(app: tauri::AppHandle, auth: AuthState, to: String, subject: String, body: String) -> Result<(), String> {
-    auth.require(auth::unix_now())?;
-    let url = mailto(&to, &subject, &body)?;
-    app.opener().open_url(url, None::<&str>).map_err(|_| "Could not open a mail program on this computer.".to_string())
-}
-
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
@@ -570,28 +543,4 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running Recruit Desk");
-}
-
-#[cfg(test)]
-mod mail_tests {
-    use super::mailto;
-
-    #[test]
-    fn a_ready_written_email_is_encoded_for_a_mail_program() {
-        let u = mailto("ann@example.com", "You are invited to join Acme on Recruit Desk", "Hello,\n\nInvitation id: 1b9d6bcd-bbfd\nDownload: https://github.com/x/y/releases/latest/download/Recruit-Desk-Setup.exe\nTom & Jerry (100%) \"quoted\"").unwrap();
-        assert!(u.starts_with("mailto:ann@example.com?subject=You%20are%20invited%20to%20join%20Acme%20on%20Recruit%20Desk&body=Hello%2C%0D%0A%0D%0AInvitation%20id%3A%201b9d6bcd-bbfd%0D%0A"), "{u}");
-        assert!(u.contains("https%3A%2F%2Fgithub.com%2Fx%2Fy%2Freleases%2Flatest%2Fdownload%2FRecruit-Desk-Setup.exe"));
-        assert!(u.contains("Tom%20%26%20Jerry%20%28100%25%29%20%22quoted%22") || u.contains("Tom%20%26%20Jerry%20%28100%25%29"), "{u}");
-        assert!(!u[7..].contains(' ') && !u.contains('\n') && !u.contains('"'));
-    }
-
-    #[test]
-    fn a_bad_address_or_an_over_long_message_is_refused_before_anything_opens() {
-        for bad in ["", "ann", "ann@", "@example.com", "ann@example", "a@b@example.com", "ann smith@example.com", "ann@example.com?cc=boss@example.com", "ann@example.com,boss@example.com", "ann@example.com&bcc=x@y.zz"] {
-            assert!(mailto(bad, "s", "b").is_err(), "{bad}");
-        }
-        assert!(mailto("ann@example.com", &"s".repeat(201), "b").is_err());
-        assert!(mailto("ann@example.com", "s", &"b".repeat(1801)).is_err());
-        assert!(mailto("ann.o+tag@sub.example.co.in", "s", "b").is_ok());
-    }
 }

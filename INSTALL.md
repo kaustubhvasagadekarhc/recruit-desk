@@ -6,7 +6,7 @@ Recruit Desk is a desktop app that runs three AI research assistants (Find candi
 
 - A **Claude account** that can use Claude Code. The assistants run through it and use your Claude allowance.
 - **Node.js and npm**, **Claude Code** and **uv** (a Python tool runner). The Windows installer checks for these and installs them for you. On Linux you install them yourself.
-- An **invitation code** from your company's admin, (the admin's People screen writes the invitation email for them, with the invitation id and this download link), or, if you are the first admin, the code printed by the company setup (see "Setting up the company" below).
+- An **invitation code** from your company's admin, or, if you are the first admin, the code printed by the company setup (see "Setting up the company" below).
 - Optional: an **Exa key** (web search; Exa gives a free key at https://dashboard.exa.ai) and, for account research only, an **Apollo key** (paid). Each person uses their own keys, and they stay on that person's computer.
 
 ## Windows
