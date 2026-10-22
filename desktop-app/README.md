@@ -166,6 +166,8 @@ An admin only sees and manages people in their own company. The window never hol
 
 ## Settings and prerequisites
 
+**Theme.** The app is light by default, whatever the computer prefers; Settings > Appearance offers Light, Dark and "Match my computer", and the choice is remembered (under `theme-v2` in the window's storage; an earlier "dark" choice is kept, an earlier default of "match my computer" becomes light).
+
 - **AI-AGENTS folder**: detected next to the app (the app's folder and its parents, directly or in an
   `AI-AGENTS` child), then where the installer put it (the path in `agents-root.txt` next to the exe,
   else `%USERPROFILE%\Documents\Recruit Desk\AI-AGENTS`). If it is not found, enter it in Settings.

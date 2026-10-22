@@ -12,7 +12,7 @@ async function page(q, dark) {
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 860 }, colorScheme: dark ? "dark" : "light", reducedMotion: "reduce" });
   const p = await ctx.newPage();
   p.on("pageerror", (e) => errors.push(`${q}: ${e.message}`));
-  await p.goto(`http://127.0.0.1:${port}/index.html?${q}`);
+  await p.goto(`http://127.0.0.1:${port}/index.html?${q}${dark ? "&theme=dark" : ""}`);
   await p.waitForTimeout(900);
   return p;
 }

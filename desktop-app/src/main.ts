@@ -1687,10 +1687,12 @@ function applyTheme(t: string) {
   if (t === "light" || t === "dark") document.documentElement.dataset.theme = t;
   else delete document.documentElement.dataset.theme;
   document.querySelectorAll<HTMLInputElement>("input[name=theme]").forEach((r) => (r.checked = r.value === t));
-  store.set("theme", t);
+  store.set("theme-v2", t);
 }
+// Light by default, whatever the computer prefers. A person's own choice is kept: "theme-v2" is theirs; before it existed the default
+// was "match my computer", so an old "dark" can only have been chosen on purpose and is kept, an old "system" or "light" becomes light.
 function initTheme() {
-  applyTheme(store.get("theme") ?? "system");
+  applyTheme(store.get("theme-v2") ?? (store.get("theme") === "dark" ? "dark" : "light"));
   document.querySelectorAll<HTMLInputElement>("input[name=theme]").forEach((r) => (r.onchange = () => applyTheme(r.value)));
 }
 
