@@ -237,6 +237,12 @@
         ];
         return all.filter((l) => (!args.kind || l.kind === args.kind) && (!args.level || l.level === args.level) && (!args.email || l.user_email === String(args.email).toLowerCase()));
       }
+      case "open_mail": {
+        window.__mock.counts.open_mail = (window.__mock.counts.open_mail || 0) + 1;
+        window.__mock.lastMail = { to: args.to, subject: args.subject, body: args.body };
+        if (q.get("mail") === "none") throw "Could not open a mail program on this computer.";
+        return null;
+      }
       case "history_list": return (histFail(), histSee());
       case "history_rows": return (histFail(), (HIST.rows[args.searchId] || []).filter(() => histSee().some((x) => x.id === args.searchId)).map((r) => ({ ...r })));
       case "history_delete": {

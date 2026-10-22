@@ -72,7 +72,14 @@ for (const dark of [false, true]) {
   await p.click("#invite-send"); await p.waitForTimeout(700);
   const code = await p.locator("#link-url").inputValue();
   ok(`[${t}] invite: the code is shown, with who it is for`, (await vis(p, "#link-box")) && (await txt(p, "#link-title")) === "Invitation code for fresh.person@humancloud.co.in" && /^[0-9a-f]{8}(-[0-9a-f]{4}){3}-[0-9a-f]{12}$/.test(code));
-  ok(`[${t}] invite: the text says how to hand it over and that nothing is emailed`, (await txt(p, "#link-text")).startsWith("Give this code to fresh.person@humancloud.co.in.") && (await txt(p, "#link-text")).includes("exactly this email address") && (await txt(p, "#link-text")).includes("No email is sent"));
+  ok(`[${t}] invite: the text says the app writes the email and what it holds`, (await txt(p, "#link-text")).startsWith('Press "Email the invitation" to open a ready-written email to fresh.person@humancloud.co.in') && (await txt(p, "#link-text")).includes("invitation id and the download link") && !(await txt(p, "#link-text")).includes("No email is sent"));
+  ok(`[${t}] invite: the Email and Copy message buttons are offered`, (await vis(p, "#link-mail")) && (await vis(p, "#link-copy-msg")));
+  await p.click("#link-mail"); await p.waitForTimeout(400);
+  const mail = await p.evaluate(() => window.__mock.lastMail);
+  ok(`[${t}] invite: Email the invitation opens the mail program with the invitation id and the download link, no accept link`, mail && mail.to === "fresh.person@humancloud.co.in" && mail.subject === "You are invited to join Humancloud Pvt Ltd on Recruit Desk" && mail.body.includes(`Invitation id: ${code}`) && mail.body.includes("Download the app (Windows): https://github.com/kaustubhvasagadekarhc/recruit-desk/releases/latest/download/Recruit-Desk-Setup.exe") && !/accept/i.test(mail.body), JSON.stringify(mail).slice(0, 300));
+  ok(`[${t}] invite: and says Press Send there`, (await p.locator("#toasts").textContent()).includes("Press Send there"));
+  await p.click("#link-copy-msg"); await p.waitForTimeout(300);
+  ok(`[${t}] invite: Copy the message puts the whole email on the clipboard`, (await p.evaluate(() => navigator.clipboard.readText())).startsWith("To: fresh.person@humancloud.co.in\nSubject: You are invited to join Humancloud Pvt Ltd on Recruit Desk\n\nHello,") && (await p.evaluate(() => navigator.clipboard.readText())).includes(code));
   ok(`[${t}] invite: the warning names the role and the company`, (await txt(p, "#link-warn")).includes("as admin") && (await txt(p, "#link-warn")).includes("Humancloud Pvt Ltd"));
   ok(`[${t}] invite: the form is cleared and the waiting list grew`, (await p.locator("#invite-email").inputValue()) === "" && (await p.locator("#invites-box tbody tr").count()) === 3);
   await shot(p, `people-link-${t}`);

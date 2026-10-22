@@ -27,6 +27,9 @@ fs.mkdirSync(out, { recursive: true });
 const exeName = `Recruit-Desk_${version}_x64-setup.exe`;
 fs.copyFileSync(exeSrc, path.join(out, exeName));
 fs.copyFileSync(`${exeSrc}.sig`, path.join(out, `${exeName}.sig`));
+// The same installer under a name without a version: https://github.com/<repo>/releases/latest/download/Recruit-Desk-Setup.exe always names
+// the newest release's installer, which is the link in the invitation email.
+fs.copyFileSync(exeSrc, path.join(out, "Recruit-Desk-Setup.exe"));
 const deb = path.join(root, "src-tauri", "target", "release", "bundle", "deb", `Recruit Desk_${version}_amd64.deb`);
 if (fs.existsSync(deb)) fs.copyFileSync(deb, path.join(out, `Recruit-Desk_${version}_amd64.deb`));
 

@@ -1,7 +1,7 @@
 // Author: kaustubh.s.v
 // Tests for src/plain.ts (compiled to dist/plain.js by tsc): real step result lines must read as plain language.
 import assert from "node:assert/strict";
-import { plainResult, cleanLine, offlineText, roleLabel, signInSummary, isSignInRequired, formatUtc, expiresText, validEmail, userActions, inviteResultText, looksLikeCode, passwordProblem, LINK_TEXT, MIN_PASSWORD, loginNotice, recordsLine, recordSummary, AGENT_LABEL, searchSummary, statusLabel, resultsText, historyIntro, historyLine, removeSearchText, assistantName, windowText, sharedNote, allowanceIntro, allowanceInput } from "../dist/plain.js";
+import { plainResult, cleanLine, offlineText, roleLabel, signInSummary, isSignInRequired, formatUtc, expiresText, validEmail, userActions, inviteEmail, DOWNLOAD_URL, inviteResultText, looksLikeCode, passwordProblem, LINK_TEXT, MIN_PASSWORD, loginNotice, recordsLine, recordSummary, AGENT_LABEL, searchSummary, statusLabel, resultsText, historyIntro, historyLine, removeSearchText, assistantName, windowText, sharedNote, allowanceIntro, allowanceInput } from "../dist/plain.js";
 
 const cases = [
   ["company", 1, "humancloud.co.in confirmed from site (Humancloud Technologies); memory has same name under humancloud.dev; careers page unknown, ATS none",
@@ -183,10 +183,19 @@ const CODE = "1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed";
 for (const ok of [CODE, CODE.toUpperCase(), ` ${CODE} `]) assert.equal(looksLikeCode(ok), true, ok);
 for (const bad of ["", "1b9d6bcd", CODE + "x", CODE.replace(/-/g, ""), "zzzzzzzz-bbfd-4b2d-9b5d-ab8dfbbd4bed", `https://x.test/?c=${CODE}`]) assert.equal(looksLikeCode(bad), false, bad);
 const inv = inviteResultText({ email: "a@b.co", role: "user", expires_at: "2026-10-20T10:00:00Z", code: CODE }, NOWMS);
-assert.match(inv, /Give this code to a@b.co/);
-assert.match(inv, /exactly this email address/);
+assert.match(inv, /ready-written email to a@b\.co/);
+assert.match(inv, /invitation id and the download link/);
 assert.match(inv, /ends in 2 days/);
-assert.match(inv, /No email is sent/);
+assert.doesNotMatch(inv, /No email is sent/);
+assert.equal(DOWNLOAD_URL, "https://github.com/kaustubhvasagadekarhc/recruit-desk/releases/latest/download/Recruit-Desk-Setup.exe");
+const mail = inviteEmail("Acme Corp", "boss@acme.com", { email: "a@b.co", role: "user", expires_at: "2026-10-20T10:00:00Z", code: CODE }, NOWMS);
+assert.equal(mail.to, "a@b.co");
+assert.equal(mail.subject, "You are invited to join Acme Corp on Recruit Desk");
+assert.match(mail.body, /^Hello,\n\nboss@acme\.com invited you to join Acme Corp on Recruit Desk\.\n\nInvitation id: 1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed\n\nDownload the app \(Windows\): https:\/\/github\.com\/kaustubhvasagadekarhc\/recruit-desk\/releases\/latest\/download\/Recruit-Desk-Setup\.exe\n\n/);
+assert.match(mail.body, /choose "I have an invitation code", and enter this email address \(a@b\.co\), the invitation id above and a password of your own\./);
+assert.match(mail.body, /works once, only for this address, and ends in 2 days\./);
+assert.ok(!/accept/i.test(mail.body), "no accept-invitation link");
+assert.ok(mail.body.length < 1000);
 console.log("admin wording tests passed");
 
 // ---------- invitation and reset link ----------

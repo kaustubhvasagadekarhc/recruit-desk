@@ -2063,3 +2063,28 @@ fn e2e_a_run_s_results_stay_in_the_data_folder_and_only_the_people_side_reaches_
     // 9. the file never left: still exactly what the assistant wrote, readable by the window
     assert_eq!(crate::excel::read_sheet(&wb, Some("Acme")).unwrap().rows.len(), 2);
 }
+
+/// Sends one real invitation (Neon sends the email when the branch's organization setting `send_invitation_email` is on).
+///   AUTH_LIVE_STEP=create: the owner makes the account with the operator's code.  AUTH_LIVE_STEP=invite: the owner signs in and invites AUTH_LIVE_INVITE_TO.
+#[test]
+#[ignore = "needs AUTH_LIVE_* on a throwaway branch; sends a real email in the invite step"]
+fn live_invitation_email_step() {
+    let env = |k: &str| std::env::var(k).unwrap_or_else(|_| panic!("set {k}"));
+    let (code, owner_email, pw, step) = (env("AUTH_LIVE_CODE"), env("AUTH_LIVE_OWNER_EMAIL"), env("AUTH_LIVE_PASSWORD"), env("AUTH_LIVE_STEP"));
+    let now = unix_now();
+    let owner = live_service(&code);
+    if step == "accept" {
+        // the invited person makes their account with the code from the invitation
+        let st = patient(|| owner.create_account(&env("AUTH_LIVE_INVITE_TO"), &pw, &env("AUTH_LIVE_INVITE_CODE"), now)).unwrap();
+        println!("ACCEPT: {} {:?}", st.state, st.message);
+        assert_eq!(st.state, "signed_in", "{st:?}");
+    } else if step == "create" {
+        let st = patient(|| owner.create_account(&owner_email, &pw, &env("AUTH_LIVE_OWNER_INVITE"), now)).unwrap();
+        assert_eq!(st.state, "signed_in", "{st:?}");
+    } else {
+        assert_eq!(patient(|| owner.login(&owner_email, &pw, now)).unwrap().state, "signed_in");
+        settle();
+        let inv = patient(|| owner.admin(&AdminOp::Invite { email: env("AUTH_LIVE_INVITE_TO"), role: "user".into() }, now)).unwrap();
+        println!("INVITATION: {}", serde_json::to_string(&inv).unwrap());
+    }
+}
