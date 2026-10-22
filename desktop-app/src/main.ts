@@ -1995,7 +1995,7 @@ function renderRecords() {
   box.classList.toggle("hidden", !show);
   if (!show) return;
   $("#history-line").textContent = historyLine(historyResult);
-  $("#live-line").textContent = lastLive ? `Live updates: this window asks the company database for changes (your allowance, History, People) every ${LIVE_MS / 1000} seconds while it is open (last time ${new Date(lastLive).toLocaleTimeString()}).` : "";
+  $("#live-line").textContent = lastLive ? `Live updates: this window asks the company database for changes (your allowance, History, People) every ${LIVE_MS / 1000} seconds while an assistant runs or this screen is open, and once a minute otherwise (last time ${new Date(lastLive).toLocaleTimeString()}).` : "";
   $("#records-list").replaceChildren(...recordsResults.map((r) => el("li", { class: r.state }, recordsLine(r))));
 }
 
@@ -2536,11 +2536,17 @@ async function installUpdate() {
 // stay in the data folder on this computer. A hidden window asks nothing until it is shown again.
 
 const LIVE_MS = 10_000;
+const LIVE_QUIET_MS = 60_000;   // on an assistant screen with nothing running, once a minute is enough
 let lastLive = 0;
 let liveBusy = false;
 
+// Quick (every 10 seconds) only where changes made elsewhere matter: while an assistant runs, and on History, People, Logs and Settings.
+// Otherwise the database is asked once a minute, so an idle window does not keep it awake all day. Showing or focusing the window asks at once.
+const liveIsQuick = () => AGENT_KEYS.some((k) => views[k].running) || ["history", "admin", "logs", "settings"].includes(currentView);
+
 async function liveTick(force = false) {
   if (liveBusy || (document.hidden && !force) || !auth.enabled || auth.state !== "signed_in") return;
+  if (!force && !liveIsQuick() && Date.now() - lastLive < LIVE_QUIET_MS) return;
   liveBusy = true;
   try {
     await invoke("allowance_refresh").catch(() => {});

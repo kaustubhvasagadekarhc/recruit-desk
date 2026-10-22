@@ -205,7 +205,7 @@ It keeps its own usage file (`RECRUIT_DESK_DATA`, default `./headless-data`), se
 
 ## Live updates from the database
 
-The company database cannot push changes to the app (the Data API has no live channel), so while the window is open and someone is signed in, the app asks for changes every 10 seconds (and at once when the window is shown or focused; a hidden window asks nothing). It refreshes the person's allowance count (so a lock, a new cap or a reset made by an admin shows within seconds) and the screen that is open: History, People, the admin's usage table. The Excel results are not part of it: they are local. Settings shows when it last asked. Each tick is a handful of small requests.
+The company database cannot push changes to the app (the Data API has no live channel), so while the window is open and someone is signed in, the app asks for changes. It asks every 10 seconds only where changes made elsewhere matter: while an assistant is running and on History, People, Logs and Settings. On an assistant screen with nothing running it asks once a minute, and a hidden window asks nothing; showing or focusing the window asks at once. This keeps an idle window from holding the Neon database awake all day (about one request a minute instead of six). It refreshes the person's allowance count (so a lock, a new cap or a reset made by an admin shows within seconds on the screens above) and the screen that is open. The Excel results are not part of it: they are local.
 
 ## Updates for installed copies
 

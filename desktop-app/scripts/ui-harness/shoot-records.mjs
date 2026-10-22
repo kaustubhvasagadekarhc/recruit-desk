@@ -140,14 +140,24 @@ for (const dark of [false, true]) {
   ok(`[${t}] update: a failed check is said in plain words`, (await txt(p, "#update-line")).startsWith("Could not reach the update server."));
   await p.close();
 
-  // live updates: the app asks the database for changes while the window is open
+  // live updates: quick on Settings and other change-sensitive screens, once a minute on an idle assistant screen
   p = await page("s=idle&view=candidate&auth=in", dark);
-  const c0 = await p.evaluate(() => window.__mock.counts.allowance_refresh || 0);
-  await p.waitForTimeout(10600);
-  const c1 = await p.evaluate(() => window.__mock.counts.allowance_refresh || 0);
-  ok(`[${t}] live: after ten seconds the allowance was asked for again`, c1 > c0, `${c0} -> ${c1}`);
+  await p.waitForTimeout(12000);   // the first look comes after about ten seconds
+  const a0 = await p.evaluate(() => window.__mock.counts.allowance_refresh || 0);
+  await p.waitForTimeout(25000);
+  const a1 = await p.evaluate(() => window.__mock.counts.allowance_refresh || 0);
+  ok(`[${t}] live: an idle assistant screen does not ask every ten seconds`, a1 === a0, `${a0} -> ${a1}`);
   await openSettings(p);
-  ok(`[${t}] live: Settings says what it asks for, how often and when it last did`, /^Live updates: this window asks the company database for changes \(your allowance, History, People\) every 10 seconds while it is open \(last time .+\)\.$/.test(await txt(p, "#live-line")));
+  const s0 = await p.evaluate(() => window.__mock.counts.allowance_refresh || 0);
+  await p.waitForTimeout(10600);
+  const s1 = await p.evaluate(() => window.__mock.counts.allowance_refresh || 0);
+  ok(`[${t}] live: on Settings the allowance is asked for every ten seconds`, s1 > s0, `${s0} -> ${s1}`);
+  ok(`[${t}] live: Settings says when it asks, and that an idle screen asks once a minute`, /^Live updates: this window asks the company database for changes \(your allowance, History, People\) every 10 seconds while an assistant runs or this screen is open, and once a minute otherwise \(last time .+\)\.$/.test(await txt(p, "#live-line")), await txt(p, "#live-line"));
+  await p.locator(".tab[data-view=candidate]").click();
+  await p.waitForTimeout(72000);
+  const q1 = await p.evaluate(() => window.__mock.counts.allowance_refresh || 0);
+  ok(`[${t}] live: back on the assistant screen it still asks once a minute`, q1 > s1, `${s1} -> ${q1}`);
+  await openSettings(p);
   // the data folder: where the results are kept, and a button to open it
   ok(`[${t}] data folder: Settings names the folder and says the files are not sent anywhere`, (await txt(p, "#data-folder-line")) === "Folder: C:\\Users\\ann\\Documents\\RecruitDesk-Data" && (await txt(p, "#card-data")).includes("Find candidates, Company jobs and Accounts") && (await txt(p, "#card-data")).includes("not sent to the company database"));
   await p.click("#open-data-folder");
