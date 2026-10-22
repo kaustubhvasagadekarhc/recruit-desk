@@ -1,0 +1,1 @@
+{"default":{"identifier":"default","description":"Main window: core events only; URLs open through the app's own open_url command","local":true,"windows":["main"],"permissions":["core:default"]}}

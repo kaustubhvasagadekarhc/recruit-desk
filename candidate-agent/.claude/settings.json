@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "defaultMode": "default",
+    "allow": [
+      "Read(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/**)",
+      "Edit(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/**)",
+      "Write(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/**)",
+      "Bash(uv run scripts/memory.py *)",
+      "Bash(uv run scripts/progress.py *)",
+      "Bash(uv run scripts/score.py *)",
+      "Bash(uv run scripts/dedupe.py *)",
+      "Bash(uv run scripts/excel_upsert.py *)",
+      "Bash(uv run scripts/retention.py)",
+      "Bash(uv run scripts/evidence.py *)",
+      "Bash(uv run scripts/export_crm.py *)",
+      "Bash(uv run scripts/dev_evidence.py *)",
+      "Bash(uv run scripts/tune_weights.py *)",
+      "Bash(uv run scripts/export_shortlist.py *)",
+      "Bash(uv run scripts/outreach.py *)",
+      "Bash(python3 .claude/hooks/test_guard.py)",
+      "Bash(uv run tests/run_tests.py)",
+      "Bash(uv sync)",
+      "Bash(ls *)",
+      "mcp__exa__web_search_exa",
+      "mcp__exa__web_fetch_exa",
+      "mcp__claude_ai_Exa__web_search_exa",
+      "mcp__claude_ai_Exa__web_fetch_exa",
+      "Skill(scout)",
+      "Skill(parse-jd)",
+      "Skill(discover-candidates)",
+      "Skill(score-candidates)",
+      "Skill(write-excel)",
+      "Skill(recruiter-feedback)",
+      "Skill(draft-outreach)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Bash(cat .env*)",
+      "Bash(git *)",
+      "Bash(curl *)",
+      "Bash(wget *)",
+      "Bash(sudo *)",
+      "Bash(pip install *)",
+      "Bash(npm install *)",
+      "Bash(npx *)",
+      "WebFetch(domain:linkedin.com)",
+      "WebFetch(domain:www.linkedin.com)",
+      "WebFetch(domain:indeed.com)",
+      "WebFetch(domain:www.indeed.com)",
+      "Edit(//home/humancloud-101/Documents/timepass/AI-AGENTS/company-agent/**)",
+      "Write(//home/humancloud-101/Documents/timepass/AI-AGENTS/company-agent/**)",
+      "Read(//home/humancloud-101/Documents/timepass/AI-AGENTS/company-agent/**)",
+      "Bash(sqlite3)",
+      "Bash(sqlite3 *)",
+      "Bash(* .shell*)",
+      "Bash(* .system*)",
+      "Bash(python -c *)",
+      "Bash(python3 -c *)",
+      "Bash(uv run python -c *)",
+      "Bash(uv run --with *)",
+      "Bash(uv run -- *)",
+      "Bash(uvx *)",
+      "Bash(uv pip *)",
+      "Bash(uv add *)",
+      "Bash(uv tool *)",
+      "Bash(node -e *)",
+      "Bash(perl -e *)",
+      "Bash(bash -c *)",
+      "Bash(sh -c *)",
+      "Bash(printenv*)",
+      "Bash(env)",
+      "Bash(* --apply*)",
+      "Edit(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/scripts/**)",
+      "Write(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/scripts/**)",
+      "Edit(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/.claude/**)",
+      "Write(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/.claude/**)",
+      "Edit(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/tests/**)",
+      "Write(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/tests/**)",
+      "Edit(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/schema/**)",
+      "Write(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/schema/**)",
+      "Edit(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/CLAUDE.md)",
+      "Write(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/CLAUDE.md)",
+      "Edit(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/.mcp.json)",
+      "Write(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/.mcp.json)",
+      "Edit(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/pyproject.toml)",
+      "Write(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/pyproject.toml)",
+      "Edit(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/uv.lock)",
+      "Write(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/uv.lock)",
+      "Edit(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/run.sh)",
+      "Write(//home/humancloud-101/Documents/timepass/AI-AGENTS/candidate-agent/run.sh)",
+      "mcp__linkedin*",
+      "mcp__hasdata__*"
+    ],
+    "ask": [
+      "Bash(uv run scripts/memory.py forget *)"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "exa"
+  ],
+  "disabledMcpjsonServers": [
+    "hasdata"
+  ],
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit|Bash|WebFetch|mcp__.*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard.py\"",
+            "timeout": 20
+          }
+        ]
+      }
+    ]
+  }
+}

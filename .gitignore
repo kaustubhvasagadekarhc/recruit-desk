@@ -1,0 +1,49 @@
+# Secrets and local settings
+.env
+.env.*
+!.env.example
+*.local
+
+# People's data: workbooks, databases, backups, runs, exports
+*.xlsx
+*.xls
+*.db
+*.db-journal
+*.sqlite
+backups/
+*.backup-*
+runs/
+exports/
+data/
+last_record.json
+new_rows.jsonl
+new_rows.sending.jsonl
+erased_rows.jsonl
+team.csv
+fixtures.json
+!desktop-app/src-tauri/tests/fixtures/*.xlsx
+
+# Built installers and tool output
+*.exe
+*.deb
+*.msi
+*.dmg
+node_modules/
+target/
+dist/
+.venv/
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+agents-bundle/
+shots/
+*.log
+.DS_Store
+
+release/
+
+# parsed job descriptions made by runs (a company's own hiring data); a sample or example file may be tracked
+**/jds/*
+!**/jds/sample*
+!**/jds/example*

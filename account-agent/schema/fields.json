@@ -1,0 +1,105 @@
+{
+  "_comment": "Columns of Account_Research.xlsx in order, and the allowed values of the closed fields. Read by scripts/common.py. Builder-owned: the agent never edits this file.",
+  "columns": [
+    "Company",
+    "Domain",
+    "Product Type",
+    "What They Build (brief)",
+    "Company Brief (founded, size, customers, milestones)",
+    "HQ / US Office",
+    "India Office",
+    "Product?",
+    "Funding",
+    "India Connection (US-based leader)",
+    "Development Requirement (current)",
+    "Who to Contact",
+    "Leadership Education & Background",
+    "Warm Connection / Common Ground",
+    "Conversation Starter (cold email / conference)",
+    "Best Person to Reach Out (HumanCloud side)",
+    "Sources",
+    "Confidence",
+    "Last Checked"
+  ],
+  "product_types": [
+    "SaaS",
+    "Platform / API",
+    "Marketplace",
+    "Fintech",
+    "Healthtech",
+    "E-commerce / Retail",
+    "Consumer App",
+    "Enterprise Software",
+    "Hardware / IoT",
+    "AI / Deep Tech",
+    "IT Services / Consulting",
+    "Other"
+  ],
+  "product_values": [
+    "Yes",
+    "No",
+    "Both"
+  ],
+  "confidence_values": [
+    "High",
+    "Medium",
+    "Low"
+  ],
+  "india_connection_none": "No evidence found",
+  "team_note": "add team.csv",
+  "cited_fields": [
+    "What They Build (brief)",
+    "Company Brief (founded, size, customers, milestones)",
+    "HQ / US Office",
+    "India Office",
+    "Funding",
+    "Who to Contact",
+    "Leadership Education & Background",
+    "Conversation Starter (cold email / conference)"
+  ],
+  "reason_fields": [
+    "Product Type",
+    "What They Build (brief)",
+    "Company Brief (founded, size, customers, milestones)",
+    "HQ / US Office",
+    "India Office",
+    "Product?",
+    "Funding",
+    "India Connection (US-based leader)",
+    "Who to Contact",
+    "Leadership Education & Background"
+  ],
+  "_comment_reason_fields": "A reason field is never left empty: it holds a cited fact or 'Not found (checked: <sources tried>)' (India Connection: 'No evidence found (checked: ...)').",
+  "derived_columns": [
+    "Evidence Count",
+    "Freshness",
+    "Key Field Confidence"
+  ],
+  "key_fields": [
+    "Company Brief (founded, size, customers, milestones)",
+    "HQ / US Office",
+    "Funding",
+    "Who to Contact"
+  ],
+  "_comment_derived": "derived_columns are appended after columns on every Accounts sheet by excel_upsert.py (scripts/evidence.py); key_fields set Freshness and Key Field Confidence.",
+  "typed_columns": [
+    "Founded Year",
+    "Employees",
+    "Employees As Of",
+    "Last Round",
+    "Last Round Amount USD",
+    "Last Round Date",
+    "Total Raised USD",
+    "HQ City",
+    "HQ Country",
+    "India Office City",
+    "Public/Private",
+    "Ticker"
+  ],
+  "_comment_typed": "typed_columns follow derived_columns: one fact per cell, set by scripts/typed.py only from cited facts (ints, ISO dates, enums), each with an Evidence row; blank when uncited.",
+  "h1b_columns": [
+    "H-1B Filings (4Q)",
+    "H-1B Top Roles"
+  ],
+  "_comment_h1b": "h1b_columns follow typed_columns: DOL OFLC LCA disclosure data for the last 4 quarters (scripts/h1b.py), cited per quarter file in Evidence; a company-level hiring signal, never a claim about a person."
+}

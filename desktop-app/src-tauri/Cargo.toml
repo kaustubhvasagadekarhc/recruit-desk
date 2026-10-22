@@ -1,0 +1,54 @@
+# Author: kaustubh.s.v
+[package]
+name = "recruit-desk"
+version = "0.1.0"
+authors = ["kaustubh.s.v"]
+description = "Runs the Candidate Research and Company Intelligence agents with a token cap"
+edition = "2021"
+# `cargo run` (and so `cargo tauri dev`) must pick the GUI binary; `headless` stays available via --bin headless.
+default-run = "recruit-desk"
+
+[lib]
+name = "recruit_desk_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[[bin]]
+name = "recruit-desk"
+path = "src/main.rs"
+
+[[bin]]
+name = "headless"
+path = "src/bin/headless.rs"
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = { version = "1", features = ["preserve_order"] }
+calamine = "0.31"
+# Sign-in (auth.rs): HTTPS to the auth service, checking its Ed25519-signed tokens, the session kept in the OS keychain.
+ureq = { version = "2", default-features = false, features = ["tls"] }
+base64 = "0.22"
+tauri-plugin-updater = "2.14.0"
+
+[target.'cfg(windows)'.dependencies]
+keyring = { version = "3", default-features = false, features = ["windows-native"] }
+
+[target.'cfg(target_os = "linux")'.dependencies]
+keyring = { version = "3", default-features = false, features = ["sync-secret-service", "crypto-rust"] }
+
+[target.'cfg(target_os = "macos")'.dependencies]
+keyring = { version = "3", default-features = false, features = ["apple-native"] }
+
+[target.'cfg(unix)'.dependencies]
+libc = "0.2"
+
+[profile.release]
+opt-level = "s"
+lto = true
+codegen-units = 1
+strip = true
+panic = "abort"

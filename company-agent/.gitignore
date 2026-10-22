@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+.venv/
+__pycache__/
+memory.db
+runs/
+*.xlsx
+~$*.xlsx
+backups/
+last_record.json
+new_rows.jsonl
+new_rows.sending.jsonl
+erased_rows.jsonl

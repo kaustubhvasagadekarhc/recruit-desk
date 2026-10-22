@@ -1,0 +1,61 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "Recruit Desk",
+  "version": "0.1.0",
+  "identifier": "in.humancloud.recruitdesk",
+  "build": {
+    "frontendDist": "../dist",
+    "beforeBuildCommand": "npm run build"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "Recruit Desk",
+        "width": 1280,
+        "height": 800,
+        "minWidth": 1024,
+        "minHeight": 640
+      }
+    ],
+    "security": {
+      "csp": "default-src 'self'; style-src 'self' 'unsafe-inline'; script-src 'self'; img-src 'self' data:"
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": [
+      "nsis",
+      "deb"
+    ],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.ico",
+      "icons/icon.png"
+    ],
+    "windows": {
+      "nsis": {
+        "installMode": "currentUser",
+        "template": "windows/installer.nsi",
+        "installerHooks": "windows/hooks.nsh"
+      }
+    },
+    "publisher": "kaustubh.s.v",
+    "copyright": "© 2026 kaustubh.s.v",
+    "shortDescription": "Find candidates and check company jobs with AI assistants",
+    "createUpdaterArtifacts": true
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDIxMzJCRTNFOURGMjMzNTEKUldSUk0vS2RQcjR5SVRXSTg1UjZpSmxBd1BpWC9RMlQ3bW9WV1NaendGOG1TNGR6K0RRbXdPZ0QK",
+      "endpoints": [
+        "https://github.com/kaustubhvasagadekarhc/recruit-desk/releases/latest/download/latest.json"
+      ],
+      "windows": {
+        "installMode": "passive"
+      }
+    }
+  }
+}

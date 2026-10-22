@@ -1,0 +1,23 @@
+{
+  "name": "keka",
+  "ats": "keka",
+  "label": "Keka",
+  "version": 1,
+  "description": "Keka Hire public careers portal: the job list its own careers page and embed widget load (GET /careers/api/jobs/default/active, no key, robots allows /careers).",
+  "host_pattern": "^[a-z0-9-]+\\.keka\\.com$",
+  "slug_pattern": "^[a-z0-9-]{2,40}$",
+  "board_url": "https://{slug}.keka.com/careers/",
+  "request": {"method": "GET", "url": "https://{slug}.keka.com/careers/api/jobs/default/active"},
+  "pagination": {"type": "none"},
+  "response": {"format": "json", "items": "$"},
+  "fields": {
+    "title": "title",
+    "url": {"template": "https://{slug}.keka.com/careers/jobdetails/{id}"},
+    "location": {"path": "jobLocations[*].name", "join": "; "},
+    "posted_date": "publishedOn",
+    "department": "departmentName",
+    "description": "description"
+  },
+  "provenance": {"by": "builder (hand-written, then validated and trialled through tools.py)", "when": "2026-10-15",
+                 "evidence": "https://perennialsys.com/job-openings/ embeds https://perennial.keka.com/careers/api/embedjobs/js/<uuid>; the portal script calls /api/jobs/<portal>/active"}
+}

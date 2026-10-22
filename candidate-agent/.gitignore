@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+.venv/
+memory.db
+Candidate_Research.xlsx
+runs/
+__pycache__/
+exports/
+*.backup-*
+last_record.json
+new_rows.jsonl
+new_rows.sending.jsonl
+erased_rows.jsonl

@@ -1,0 +1,9 @@
+CASE_NUMBER,CASE_STATUS,RECEIVED_DATE,DECISION_DATE,VISA_CLASS,JOB_TITLE,SOC_TITLE,EMPLOYER_NAME,TRADE_NAME_DBA,WORKSITE_CITY,WORKSITE_STATE,WAGE_RATE_OF_PAY_FROM,WAGE_RATE_OF_PAY_TO,WAGE_UNIT_OF_PAY,TOTAL_WORKER_POSITIONS
+I-200-26001-000001,Certified,2026-01-02,2026-01-09,H-1B,Software Engineer,Software Developers,"Acme Labs, Inc.",,San Francisco,CA,"$150,000.00","$190,000.00",Year,1
+I-200-26001-000002,Certified,2026-02-02,2026-02-09,H-1B,SOFTWARE ENGINEER,Software Developers,ACME LABS INC,,San Francisco,CA,140000,,Year,1
+I-200-26001-000003,Certified - Withdrawn,2026-03-02,2026-03-09,H-1B,Data Scientist,Data Scientists,Acme Labs LLC,,Austin,TX,80.00,95.00,Hour,1
+I-200-26001-000004,Certified,2025-08-02,2025-08-12,H-1B,Engineering Manager,Computer and Information Systems Managers,Sigma Holdings Inc,ACME LABS,New York,NY,210000,240000,Year,1
+I-200-26001-000005,Certified,2026-04-02,2026-04-09,E-3 Australian,Software Engineer,Software Developers,"Acme Labs, Inc.",,San Francisco,CA,160000,,Year,1
+I-200-26001-000006,Certified,2025-03-02,2025-03-09,H-1B,Software Engineer,Software Developers,"Acme Labs, Inc.",,San Francisco,CA,130000,,Year,1
+I-200-26001-000007,Denied,2026-05-02,2026-05-09,H-1B,QA Engineer,Software Quality Assurance Analysts,Acme Labs Holdings Inc,,Seattle,WA,120000,,Year,1
+I-200-26001-000008,Certified,2026-06-02,2026-06-09,H-1B,Software Engineer,Software Developers,Amazon.com Services LLC,,Seattle,WA,170000,,Year,1

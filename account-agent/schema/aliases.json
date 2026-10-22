@@ -1,0 +1,37 @@
+{
+  "_comment": "Alias table for team matching: each canonical name maps to its other spellings. Builder-owned; the human may extend it.",
+  "colleges": {
+    "IIT Bombay": ["IIT-B", "IITB", "IIT Mumbai", "Indian Institute of Technology Bombay", "Indian Institute of Technology, Bombay"],
+    "IIT Delhi": ["IIT-D", "IITD", "Indian Institute of Technology Delhi", "Indian Institute of Technology, Delhi"],
+    "IIT Madras": ["IIT-M", "IITM", "Indian Institute of Technology Madras", "Indian Institute of Technology, Madras"],
+    "IIT Kanpur": ["IIT-K", "IITK", "Indian Institute of Technology Kanpur", "Indian Institute of Technology, Kanpur"],
+    "IIT Kharagpur": ["IIT-KGP", "IIT KGP", "IITKGP", "Indian Institute of Technology Kharagpur", "Indian Institute of Technology, Kharagpur"],
+    "IIT Roorkee": ["IIT-R", "IITR", "Indian Institute of Technology Roorkee", "University of Roorkee"],
+    "IIT Guwahati": ["IIT-G", "IITG", "Indian Institute of Technology Guwahati"],
+    "BITS Pilani": ["BITS", "Birla Institute of Technology and Science", "Birla Institute of Technology & Science, Pilani"],
+    "IIM Ahmedabad": ["IIM-A", "IIMA", "Indian Institute of Management Ahmedabad"],
+    "IIM Bangalore": ["IIM-B", "IIMB", "Indian Institute of Management Bangalore"],
+    "IIM Calcutta": ["IIM-C", "IIMC", "Indian Institute of Management Calcutta"],
+    "IISc Bangalore": ["IISc", "Indian Institute of Science", "Indian Institute of Science Bangalore"],
+    "NIT Trichy": ["NIT Tiruchirappalli", "National Institute of Technology Tiruchirappalli", "REC Trichy"],
+    "COEP Pune": ["COEP", "College of Engineering Pune", "College of Engineering, Pune", "COEP Technological University"],
+    "Carnegie Mellon University": ["CMU", "Carnegie Mellon"],
+    "Stanford University": ["Stanford"],
+    "Massachusetts Institute of Technology": ["MIT"],
+    "University of California, Berkeley": ["UC Berkeley", "Berkeley", "UCB"]
+  },
+  "employers": {
+    "Tata Consultancy Services": ["TCS"],
+    "Infosys": ["Infosys Technologies"],
+    "Wipro": ["Wipro Technologies"],
+    "HCLTech": ["HCL", "HCL Technologies"],
+    "Tech Mahindra": ["TechM"],
+    "Persistent Systems": ["Persistent"],
+    "Amazon": ["Amazon.com", "Amazon Web Services", "AWS"],
+    "Google": ["Alphabet", "Google LLC"],
+    "Microsoft": ["Microsoft Corporation", "MSFT"],
+    "Meta": ["Facebook", "Meta Platforms"],
+    "Flipkart": ["Flipkart Internet"],
+    "IBM": ["International Business Machines"]
+  }
+}

@@ -1,0 +1,26 @@
+[project]
+name = "recruit-desk-auth"
+version = "0.1.0"
+description = "Invite-only account login (admin and user roles) for Recruit Desk"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.110",
+    "uvicorn>=0.29",
+    "sqlalchemy>=2.0",
+    "argon2-cffi>=23.1",
+    "pyjwt[crypto]>=2.8",
+    "pydantic[email]>=2.6",
+    "pydantic-settings>=2.2",
+    "psycopg[binary]>=3.1",
+    "vercel",
+]
+
+[dependency-groups]
+dev = ["pytest>=8", "httpx>=0.27"]
+
+[tool.vercel]
+entrypoint = "vercel_app:app"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "tests"]

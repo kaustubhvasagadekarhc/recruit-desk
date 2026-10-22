@@ -1,0 +1,27 @@
+{
+  "version": 1,
+  "about": "ATS fingerprint registry: host regex -> ATS type. Data only; read by scripts/blockers.py. The agent may add entries (one per job-board vendor) after seeing the host on a company's own careers page. 'slug' must capture (?P<slug>...) from a board or embed URL. Built-in readers live in scripts/ats.py; other ATS types are read only through an active spec in schema/readers/.",
+  "fingerprints": [
+    {"ats": "greenhouse", "label": "Greenhouse", "host": "^(?:boards|job-boards|boards-api)(?:\\.eu)?\\.greenhouse\\.io$", "builtin": true},
+    {"ats": "lever", "label": "Lever", "host": "^(?:jobs|api)(?:\\.eu)?\\.lever\\.co$", "builtin": true},
+    {"ats": "workable", "label": "Workable", "host": "^(?:apply\\.)?[a-z0-9-]+\\.workable\\.com$|^apply\\.workable\\.com$", "builtin": true},
+    {"ats": "ashby", "label": "Ashby", "host": "^(?:jobs|api)\\.ashbyhq\\.com$", "builtin": true},
+    {"ats": "smartrecruiters", "label": "SmartRecruiters", "host": "^(?:careers|jobs|api)\\.smartrecruiters\\.com$", "builtin": true},
+    {"ats": "zohorecruit", "label": "Zoho Recruit", "host": "^[a-z0-9-]+\\.zohorecruit\\.(?:com|in|eu|com\\.au|com\\.cn|jp)$", "builtin": true},
+    {"ats": "workday", "label": "Workday", "host": "^[a-z0-9-]+\\.wd\\d+\\.myworkdayjobs\\.com$", "builtin": true},
+    {"ats": "keka", "label": "Keka", "host": "^[a-z0-9-]+\\.keka\\.com$", "slug": "^https?://(?!cdn\\.|www\\.)(?P<slug>[a-z0-9-]+)\\.keka\\.com/careers(?:/|$)", "added_by": "builder", "added": "2026-10-15"},
+    {"ats": "darwinbox", "label": "Darwinbox", "host": "^[a-z0-9-]+\\.darwinbox\\.(?:in|com)$", "slug": "^https?://(?P<slug>[a-z0-9-]+)\\.darwinbox\\.(?:in|com)/", "added_by": "builder", "added": "2026-10-15"},
+    {"ats": "freshteam", "label": "Freshteam", "host": "^[a-z0-9-]+\\.freshteam\\.com$", "slug": "^https?://(?P<slug>[a-z0-9-]+)\\.freshteam\\.com/", "added_by": "builder", "added": "2026-10-15"},
+    {"ats": "bamboohr", "label": "BambooHR", "host": "^[a-z0-9-]+\\.bamboohr\\.com$", "slug": "^https?://(?P<slug>[a-z0-9-]+)\\.bamboohr\\.com/", "added_by": "builder", "added": "2026-10-15"},
+    {"ats": "recruitee", "label": "Recruitee", "host": "^[a-z0-9-]+\\.recruitee\\.com$", "slug": "^https?://(?P<slug>[a-z0-9-]+)\\.recruitee\\.com/", "added_by": "builder", "added": "2026-10-15"},
+    {"ats": "teamtailor", "label": "Teamtailor", "host": "^[a-z0-9-]+\\.teamtailor\\.com$", "slug": "^https?://(?P<slug>[a-z0-9-]+)\\.teamtailor\\.com/", "added_by": "builder", "added": "2026-10-15"},
+    {"ats": "breezy", "label": "Breezy HR", "host": "^[a-z0-9-]+\\.breezy\\.hr$", "slug": "^https?://(?P<slug>[a-z0-9-]+)\\.breezy\\.hr/", "added_by": "builder", "added": "2026-10-15"},
+    {"ats": "jazzhr", "label": "JazzHR", "host": "^[a-z0-9-]+\\.applytojob\\.com$", "slug": "^https?://(?P<slug>[a-z0-9-]+)\\.applytojob\\.com/", "added_by": "builder", "added": "2026-10-15"},
+    {"ats": "personio", "label": "Personio", "host": "^[a-z0-9-]+\\.jobs\\.personio\\.(?:de|com)$", "slug": "^https?://(?P<slug>[a-z0-9-]+)\\.jobs\\.personio\\.(?:de|com)/", "added_by": "builder", "added": "2026-10-15"},
+    {"ats": "icims", "label": "iCIMS", "host": "^[a-z0-9-]+\\.icims\\.com$", "added_by": "builder", "added": "2026-10-15"},
+    {"ats": "taleo", "label": "Taleo", "host": "^[a-z0-9-]+\\.taleo\\.net$", "added_by": "builder", "added": "2026-10-15"},
+    {"ats": "successfactors", "label": "SuccessFactors", "host": "^[a-z0-9-]+\\.successfactors\\.(?:com|eu)$", "added_by": "builder", "added": "2026-10-15"},
+    {"ats": "jobvite", "label": "Jobvite", "host": "^jobs\\.jobvite\\.com$", "slug": "^https?://jobs\\.jobvite\\.com/(?P<slug>[a-z0-9-]+)", "added_by": "builder", "added": "2026-10-15"},
+    {"ats": "rippling", "label": "Rippling", "host": "^ats\\.rippling\\.com$", "slug": "^https?://ats\\.rippling\\.com/(?P<slug>[a-z0-9-]+)", "added_by": "builder", "added": "2026-10-15"}
+  ]
+}

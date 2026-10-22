@@ -1,0 +1,9 @@
+.env
+.env.local
+.venv/
+__pycache__/
+*.db
+*.db-journal
+keys/
+.neon
+node_modules/

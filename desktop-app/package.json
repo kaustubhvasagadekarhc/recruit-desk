@@ -1,0 +1,17 @@
+{
+  "name": "recruit-desk",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "build": "tsc -p . && node scripts/copy-static.mjs && node scripts/stage-agents.mjs",
+    "test:bundle": "node scripts/stage-agents.mjs --self-test",
+    "check-installer": "node scripts/check-installer.mjs",
+    "tauri": "tauri",
+    "test:ui": "tsc -p . && node scripts/test-plain.mjs"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3"
+  },
+  "author": "kaustubh.s.v"
+}

@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "exa": {
+      "type": "http",
+      "url": "https://mcp.exa.ai/mcp"
+    },
+    "hasdata": {
+      "type": "http",
+      "url": "https://mcp.hasdata.com/api/mcp",
+      "headers": { "x-api-key": "${HASDATA_API_KEY:-}" }
+    }
+  }
+}

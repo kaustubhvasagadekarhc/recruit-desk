@@ -1,0 +1,524 @@
+<!doctype html>
+<!-- Author: kaustubh.s.v -->
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Recruit Desk</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script type="module" src="main.js" defer></script>
+</head>
+<body>
+  <!-- Sign-in screen: shown over the app (which is inert behind it) while a sign-in server is set and nobody is signed in. -->
+  <section id="login" class="login hidden" role="dialog" aria-modal="true" aria-labelledby="login-title">
+    <div class="login-card">
+      <div class="login-brand">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <rect x="3" y="6" width="26" height="20" rx="5" fill="currentColor" opacity=".16" />
+          <rect x="3" y="6" width="26" height="20" rx="5" fill="none" stroke="currentColor" stroke-width="2" />
+          <circle cx="12" cy="14" r="3.2" fill="currentColor" />
+          <path d="M7 22c1-3 3-4.4 5-4.4s4 1.4 5 4.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          <path d="M20 13h5M20 17h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        </svg>
+        <span>Recruit Desk</span>
+      </div>
+      <h1 id="login-title">Sign in</h1>
+      <p id="login-checking" class="muted hidden" role="status">Checking your sign-in…</p>
+      <p id="login-notice" class="login-notice hidden" role="status"></p>
+      <form id="login-form" novalidate>
+        <p class="muted" id="login-intro">Sign in with your email address and password.</p>
+        <label for="login-email">Email
+          <input id="login-email" type="email" autocomplete="username" spellcheck="false" autocapitalize="off" />
+        </label>
+        <label for="login-password">Password
+          <span class="key-row">
+            <input id="login-password" type="password" autocomplete="current-password" spellcheck="false" />
+            <button type="button" id="login-show" aria-pressed="false" aria-label="Show the password">Show</button>
+          </span>
+        </label>
+        <p id="login-error" class="login-error hidden" role="alert"></p>
+        <button type="submit" class="primary login-submit" id="login-submit">Sign in</button>
+      </form>
+      <p class="login-alt" id="login-alt">
+        <button type="button" class="link-btn" id="show-create">I have an invitation code</button>
+        <span aria-hidden="true">·</span>
+        <button type="button" class="link-btn" id="show-forgot">Forgot my password</button>
+      </p>
+      <form id="link-form" class="hidden" novalidate>
+        <p class="muted" id="link-intro"></p>
+        <label for="link-email" class="f-email">Email address
+          <input id="link-email" type="email" autocomplete="username" spellcheck="false" autocapitalize="off" />
+        </label>
+        <label for="link-code" class="f-code">Invitation code
+          <input id="link-code" type="text" autocomplete="off" spellcheck="false" placeholder="Like 1b9d6bcd-bbfd-4b2d-9b5d-ab8dfbbd4bed" />
+        </label>
+        <label for="link-input" class="f-link">Link from the reset email
+          <input id="link-input" type="text" autocomplete="off" spellcheck="false" placeholder="Paste the link or its code here" />
+        </label>
+        <label for="newpw-1" class="f-pw">Password
+          <span class="key-row">
+            <input id="newpw-1" type="password" autocomplete="new-password" spellcheck="false" />
+            <button type="button" id="newpw-show" aria-pressed="false" aria-label="Show the passwords">Show</button>
+          </span>
+          <span class="hint">At least 10 characters.</span>
+        </label>
+        <label for="newpw-2" class="f-pw">Type it again
+          <input id="newpw-2" type="password" autocomplete="new-password" spellcheck="false" />
+        </label>
+        <p id="link-error" class="login-error hidden" role="alert"></p>
+        <button type="submit" class="primary login-submit" id="link-submit"></button>
+        <p class="login-alt">
+          <button type="button" class="link-btn" id="link-back">Back to sign in</button>
+          <span aria-hidden="true" id="link-sep">·</span>
+          <button type="button" class="link-btn" id="link-have">I have the reset link</button>
+          <button type="button" class="link-btn" id="link-signout">Sign out</button>
+        </p>
+      </form>
+      <p class="hint login-foot">Need access? Ask your admin to invite you. Your own keys (Exa, Apollo) stay on this computer and are never sent anywhere except the service they belong to.</p>
+    </div>
+  </section>
+
+  <a class="skip" href="#main">Skip to content</a>
+
+  <aside class="nav">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+        <rect x="3" y="6" width="26" height="20" rx="5" fill="currentColor" opacity=".16" />
+        <rect x="3" y="6" width="26" height="20" rx="5" fill="none" stroke="currentColor" stroke-width="2" />
+        <circle cx="12" cy="14" r="3.2" fill="currentColor" />
+        <path d="M7 22c1-3 3-4.4 5-4.4s4 1.4 5 4.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+        <path d="M20 13h5M20 17h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+      </svg>
+      <span>Recruit Desk</span>
+    </div>
+    <nav aria-label="Sections">
+      <button class="tab" data-view="candidate" aria-current="page" aria-keyshortcuts="Control+1">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5" /><path d="M12.5 12.5 17 17" /></svg>
+        <span class="tab-text">Find candidates</span>
+        <span class="tab-state" id="state-candidate"></span>
+      </button>
+      <button class="tab" data-view="company" aria-keyshortcuts="Control+2">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><rect x="3" y="6" width="14" height="11" rx="2" /><path d="M7 6V4.5A1.5 1.5 0 0 1 8.5 3h3A1.5 1.5 0 0 1 13 4.5V6" /></svg>
+        <span class="tab-text">Company jobs</span>
+        <span class="tab-state" id="state-company"></span>
+      </button>
+      <button class="tab" data-view="account" aria-keyshortcuts="Control+3">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 17V5.5A1.5 1.5 0 0 1 5.5 4h5A1.5 1.5 0 0 1 12 5.5V17" /><path d="M12 9h2.5A1.5 1.5 0 0 1 16 10.5V17M3 17h14M7 7.5h2M7 10.5h2M7 13.5h2" /></svg>
+        <span class="tab-text">Accounts</span>
+        <span class="tab-state" id="state-account"></span>
+      </button>
+      <button class="tab hidden" data-view="history" id="tab-history" aria-keyshortcuts="Control+6">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7" /><path d="M10 6v4.2l2.8 1.8" /></svg>
+        <span class="tab-text">History</span>
+      </button>
+      <button class="tab hidden" data-view="admin" id="tab-admin" aria-keyshortcuts="Control+5">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="7.5" cy="7" r="2.8" /><path d="M2.5 16c.6-2.9 2.6-4.3 5-4.3s4.4 1.4 5 4.3" /><circle cx="14" cy="8" r="2.2" /><path d="M13.2 12c2.2-.1 3.8 1.1 4.3 3.4" /></svg>
+        <span class="tab-text">People</span>
+      </button>
+      <button class="tab hidden" data-view="logs" id="tab-logs" aria-keyshortcuts="Control+7">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 5h12M4 9h12M4 13h8M4 17h5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" /></svg>
+        <span class="tab-text">Logs</span>
+      </button>
+      <button class="tab" data-view="settings" aria-keyshortcuts="Control+4">
+        <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="2.6" /><path d="M10 2.5v2.2M10 15.3v2.2M2.5 10h2.2M15.3 10h2.2M4.7 4.7l1.6 1.6M13.7 13.7l1.6 1.6M4.7 15.3l1.6-1.6M13.7 6.3l1.6-1.6" /></svg>
+        <span class="tab-text">Settings</span><span class="badge hidden" id="setup-badge">Setup</span>
+      </button>
+    </nav>
+    <button type="button" class="quick" id="open-palette" aria-keyshortcuts="Control+K">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 6h12M4 10h12M4 14h7" /></svg>
+      <span>Quick actions</span><kbd>Ctrl K</kbd>
+    </button>
+    <div class="nav-foot">
+      <div class="account hidden" id="account-box">
+        <div class="account-who"><span class="account-email" id="account-email"></span><span class="badge role" id="account-role"></span></div>
+        <div class="account-tenant hidden" id="account-tenant"></div>
+        <div class="account-offline hidden" id="account-offline"></div>
+        <button type="button" class="link-btn" id="account-signout">Sign out</button>
+      </div>
+      <div class="credit">Built by kaustubh.s.v</div>
+      <div id="nav-version" class="version"></div>
+    </div>
+  </aside>
+
+  <main id="main" tabindex="-1">
+    <div id="update-banner" class="update-banner hidden" role="status">
+      <span id="update-text"></span>
+      <button type="button" id="update-install" class="primary">Update and restart</button>
+      <button type="button" id="update-later">Later</button>
+    </div>
+    <!-- First-run setup check -->
+    <section id="view-setup" class="view hidden" aria-labelledby="setup-title">
+      <div class="setup">
+        <h1 id="setup-title">Let's get Recruit Desk ready</h1>
+        <p class="lede" id="setup-lede">Recruit Desk checks a few things on this computer before the assistants can work.</p>
+        <div class="setup-progress" id="setup-progress">
+          <div class="bar" role="progressbar" aria-valuemin="0" id="setup-bar"><div class="fill"></div></div>
+          <span id="setup-count" class="muted"></span>
+        </div>
+        <ol id="setup-list" class="setup-list"></ol>
+        <div class="setup-actions">
+          <button class="primary" id="setup-recheck">Check again</button>
+          <button id="setup-continue">Skip for now</button>
+          <span id="setup-msg" class="muted" role="status"></span>
+        </div>
+      </div>
+    </section>
+
+    <template id="agent-tpl">
+      <section class="agent-view">
+        <header class="agent-head">
+          <div class="head-text">
+            <h1 class="title"></h1>
+            <p class="lede"></p>
+          </div>
+          <div class="meters">
+            <div class="usage">
+              <div class="usage-row">
+                <span class="usage-label">Allowance used</span>
+                <strong class="usage-pct"></strong>
+              </div>
+              <div class="bar" role="progressbar" aria-valuemin="0" aria-valuemax="100"><div class="fill"></div></div>
+              <div class="usage-note"></div>
+              <div class="usage-note usage-shared hidden"></div>
+            </div>
+            <div class="usage reset-card">
+              <div class="usage-row">
+                <span class="usage-label">Resets in</span>
+                <strong class="reset-in"></strong>
+              </div>
+              <div class="bar reset-bar" aria-hidden="true"><div class="fill reset-fill"></div></div>
+              <div class="usage-note reset-note"></div>
+            </div>
+          </div>
+        </header>
+
+        <div class="workspace">
+          <div class="card run-card">
+            <form class="run-form" novalidate>
+              <div class="inputs"></div>
+              <p class="cap-warn hidden" role="status"></p>
+              <div class="actions">
+                <button type="submit" class="primary run-btn" aria-keyshortcuts="Control+Enter"></button>
+                <button type="button" class="stop-btn danger-ghost hidden">Stop</button>
+                <span class="elapsed muted hidden" aria-live="off"></span>
+              </div>
+              <p class="form-error hidden" role="alert"></p>
+              <div class="lock-note hidden" role="status"></div>
+            </form>
+
+            <div class="progress">
+              <div class="progress-empty"></div>
+              <div class="progress-live hidden">
+                <h2 class="progress-title">Progress</h2>
+                <p class="starting muted hidden"><span class="spinner" aria-hidden="true"></span>Starting the assistant…</p>
+                <div class="result-card hidden" role="status" tabindex="-1"></div>
+                <ol class="steps" aria-live="polite"></ol>
+              </div>
+              <details class="raw hidden">
+                <summary>Show details</summary>
+                <label class="check-label"><input type="checkbox" class="show-activity" /> Include tool activity</label>
+                <div class="log" tabindex="0" aria-label="Technical log"></div>
+              </details>
+            </div>
+          </div>
+
+          <div class="card sheet-card">
+            <div class="toolbar">
+              <label class="pick-label"><span class="pick-text"></span>
+                <select class="sheet-pick"></select>
+              </label>
+              <label class="search">
+                <span class="visually-hidden">Search the table</span>
+                <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8.5" cy="8.5" r="5" /><path d="M12.5 12.5 17 17" /></svg>
+                <input class="filter" type="search" aria-keyshortcuts="Control+F" />
+              </label>
+              <button type="button" class="open-xlsx">
+                <svg viewBox="0 0 20 20" aria-hidden="true"><path d="M8 4H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-3"/><path d="M11 4h5v5M16 4l-7 7"/></svg>
+                Open in Excel
+              </button>
+            </div>
+            <div class="sheet-meta">
+              <span class="count" role="status"></span>
+              <span class="updated muted"></span>
+              <span class="spacer"></span>
+              <span class="kbd-hint muted">↑ ↓ to move · Enter for details</span>
+              <div class="tool-btns">
+                <button type="button" class="crm-btn ghost" title="Save a CSV file to import into HubSpot or Salesforce"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3v9M6 8l4 4 4-4"/><path d="M4 13v2a1 1 0 0 0 1 1h10a1 1 0 0 0 1-1v-2"/></svg>Export for CRM</button>
+                <button type="button" class="cols-btn ghost" aria-pressed="false">All columns</button>
+                <button type="button" class="refresh-btn ghost icon-btn" aria-label="Refresh the table" title="Refresh the table (F5)"><svg viewBox="0 0 20 20" aria-hidden="true"><path d="M16 10a6 6 0 1 1-1.8-4.3"/><path d="M16 3.5v3.7h-3.7"/></svg></button>
+              </div>
+            </div>
+            <div class="filters hidden" role="group" aria-label="Filter the table"></div>
+            <div class="table-wrap">
+              <table class="sheet" role="grid" tabindex="0"><colgroup></colgroup><thead></thead><tbody></tbody></table>
+              <div class="sheet-empty hidden"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lock-overlay hidden" role="dialog" aria-modal="true">
+          <div class="lock-box">
+            <svg class="lock-art" viewBox="0 0 64 64" aria-hidden="true">
+              <path d="M18 8h28M18 56h28M21 8c0 12 22 14 22 24S21 44 21 56M43 8c0 12-22 14-22 24s22 12 22 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" />
+              <path d="M26 50c2-3 10-3 12 0z" fill="currentColor" />
+            </svg>
+            <h2 class="lock-title"></h2>
+            <p class="lock-text"></p>
+            <p class="lock-count" role="timer" aria-live="off"></p>
+            <p class="lock-extra muted hidden"></p>
+            <button type="button" class="primary lock-dismiss">View saved results</button>
+            <p class="lock-esc muted">Press Esc to look at your saved results.</p>
+          </div>
+        </div>
+      </section>
+    </template>
+
+    <div id="view-candidate" class="view"></div>
+    <div id="view-company" class="view hidden"></div>
+    <div id="view-account" class="view hidden"></div>
+
+    <!-- Application logs: events, errors, runs and sign-ins of everyone in the company; only owners and admins read them (neon-backend/setup.sql, app_logs) -->
+    <section id="view-logs" class="view hidden" aria-labelledby="logs-title">
+      <div class="admin">
+        <div class="admin-head">
+          <h1 id="logs-title">Logs</h1>
+          <button type="button" id="logs-refresh">Refresh</button>
+        </div>
+        <p class="muted">What the app wrote about itself, from everyone in your company: events and errors, how each run went, and sign-ins. They hold no search text, no candidates and no contact details. Only admins can read them, and lines older than 30 days are removed.</p>
+        <div class="logs-filters">
+          <label>Kind <select id="logs-kind"><option value="">All</option><option value="event">Events and errors</option><option value="run">Runs</option><option value="signin">Sign-ins</option></select></label>
+          <label>Level <select id="logs-level"><option value="">All</option><option value="error">Errors</option><option value="warn">Warnings</option><option value="info">Information</option></select></label>
+          <label>Person <input type="text" id="logs-person" placeholder="email address" autocomplete="off"></label>
+        </div>
+        <p class="admin-error hidden" id="logs-error" role="alert"></p>
+        <div class="card">
+          <div id="logs-box" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Search history: everyone's own searches and results; an admin sees everyone's in the company (the database decides, see neon-backend/setup.sql) -->
+    <section id="view-history" class="view hidden" aria-labelledby="history-title">
+      <div class="admin">
+        <div class="admin-head">
+          <h1 id="history-title">Search history</h1>
+          <button type="button" id="history-refresh">Refresh</button>
+        </div>
+        <p class="muted" id="history-intro"></p>
+        <p class="admin-error hidden" id="history-error" role="alert"></p>
+        <div class="card">
+          <div id="history-box" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- People and access: only for admins (the tab is hidden otherwise, the backend refuses non-admins, and so does the server) -->
+    <section id="view-admin" class="view hidden" aria-labelledby="admin-title">
+      <div class="admin">
+        <div class="admin-head">
+          <h1 id="admin-title">People and access</h1>
+          <button type="button" id="admin-refresh">Refresh</button>
+        </div>
+        <p class="muted" id="admin-intro">Invite people, change who is an admin, and remove people from your company.</p>
+        <p class="admin-error hidden" id="admin-error" role="alert"></p>
+
+        <div class="card form" id="invite-card">
+          <h2>Invite someone</h2>
+          <form id="invite-form" novalidate>
+            <div class="invite-row">
+              <label for="invite-email">Email
+                <input id="invite-email" type="email" autocomplete="off" spellcheck="false" autocapitalize="off" placeholder="name@company.com" />
+              </label>
+              <label for="invite-role">Role
+                <select id="invite-role"><option value="user">User</option><option value="admin">Admin</option></select>
+              </label>
+              <button type="submit" class="primary" id="invite-send">Create invitation code</button>
+            </div>
+          </form>
+          <p class="hint">An invitation is a code you hand to the person (nothing is emailed). It works once, only for that email address, and for a limited time. You can show it again from the waiting invitations below.</p>
+          <div class="link-box hidden" id="link-box" role="status">
+            <h3 id="link-title"></h3>
+            <p id="link-text" class="muted"></p>
+            <span class="key-row"><input id="link-url" type="text" readonly spellcheck="false" aria-label="The code" /><button type="button" id="link-copy">Copy code</button></span>
+            <p class="hint" id="link-warn"></p>
+            <button type="button" id="link-close">Done</button>
+          </div>
+        </div>
+
+        <div class="card">
+          <h2>Waiting invitations</h2>
+          <div id="invites-box" aria-live="polite"></div>
+        </div>
+
+        <div class="card">
+          <h2>Last records in the company database</h2>
+          <p class="muted">The newest record each assistant created, as sent from the computers here. Only these fields are kept: nothing else leaves a person's computer.</p>
+          <div id="stored-box" aria-live="polite"></div>
+        </div>
+
+        <div class="card">
+          <h2>People</h2>
+          <div id="users-box" aria-live="polite"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-settings" class="view hidden" aria-labelledby="settings-title">
+      <div class="settings">
+        <h1 id="settings-title">Settings</h1>
+
+        <div class="card">
+          <h2>Setup check</h2>
+          <p class="muted" id="setup-summary">Checks that Claude Code, the sign-in and the assistant folders are ready.</p>
+          <button id="open-setup">Run the setup check</button>
+        </div>
+
+        <div class="card form" id="card-signin">
+          <h2>Sign-in</h2>
+          <p class="muted" id="signin-summary"></p>
+          <button type="button" id="signin-signout" class="hidden">Sign out</button>
+          <div id="records-box" class="records-box hidden">
+            <h3>Last records</h3>
+            <ul id="records-list" aria-live="polite"></ul>
+            <p class="history-line" id="history-line"></p>
+            <p class="history-line" id="live-line"></p>
+            <p class="hint">Everything is processed on this computer. What you searched, and a few fields of each result (no email, phone or evidence text), are also kept in your company's database on Neon: you see your own under History, and your company's admins see everyone's. Your Excel files are never sent anywhere.</p>
+          </div>
+          <p class="hint">Recruit Desk checks your sign-in every few minutes. If it cannot be reached you can keep working for a limited time. Your own API keys stay on this computer and are never sent to the sign-in service.</p>
+        </div>
+
+        <div class="card form hidden" id="card-allowance">
+          <h2>Allowance</h2>
+          <p class="muted" id="allowance-intro"></p>
+          <div id="allowance-people"></div>
+          <p class="admin-error hidden" id="allowance-error" role="alert"></p>
+        </div>
+
+        <div class="card" id="card-data">
+          <h2>Where your results are kept</h2>
+          <p class="muted" id="data-folder-line"></p>
+          <p class="muted">Each assistant has its own folder there, with its Excel file: Find candidates, Company jobs and Accounts. The files stay on this computer and are not sent to the company database.</p>
+          <p><button type="button" id="open-data-folder">Open the folder</button></p>
+          <p class="admin-error hidden" id="data-folder-error" role="alert"></p>
+        </div>
+
+        <div class="card">
+          <h2>Appearance</h2>
+          <div class="seg" role="radiogroup" aria-label="Theme">
+            <label><input type="radio" name="theme" value="system" /> Match my computer</label>
+            <label><input type="radio" name="theme" value="light" /> Light</label>
+            <label><input type="radio" name="theme" value="dark" /> Dark</label>
+          </div>
+        </div>
+
+        <div class="card form">
+          <h2>Folders and programs</h2>
+          <label for="set-root">Assistants folder (AI-AGENTS)
+            <input id="set-root" type="text" spellcheck="false" />
+            <span class="hint" id="hint-root"></span>
+          </label>
+          <label for="set-claude">Claude Code program (leave empty to find it automatically)
+            <input id="set-claude" type="text" spellcheck="false" />
+            <span class="hint" id="hint-claude"></span>
+          </label>
+          <div class="actions">
+            <button class="primary save-btn">Save folders</button>
+            <span class="muted save-msg" role="status"></span>
+          </div>
+        </div>
+
+        <div class="card form" id="keys-card">
+          <h2>API keys (optional)</h2>
+          <p class="muted">Saved only on this computer, in the assistants' .env files. A saved key is never shown again.</p>
+          <label for="set-exa">Exa search key (free)
+            <span class="key-row"><input id="set-exa" type="password" autocomplete="off" spellcheck="false" placeholder="Paste a new Exa API key" />
+            <button type="button" id="save-exa">Save key</button></span>
+            <span class="hint" id="hint-exa"></span>
+          </label>
+          <label for="set-apollo">Apollo API key (paid, account research only)
+            <span class="key-row"><input id="set-apollo" type="password" autocomplete="off" spellcheck="false" placeholder="Paste your Apollo API key" />
+            <button type="button" id="save-apollo">Save key</button></span>
+            <span class="hint" id="hint-apollo">Account research asks Apollo first for leaders and keeps only verified emails, at most 6 credits per company.</span>
+          </label>
+        </div>
+
+        <div class="card">
+          <h2>Keyboard shortcuts</h2>
+          <dl class="keys">
+            <dt><kbd>Ctrl</kbd> <kbd>K</kbd></dt><dd>Quick actions</dd>
+            <dt><kbd>Ctrl</kbd> <kbd>1</kbd> / <kbd>2</kbd> / <kbd>3</kbd> / <kbd>4</kbd></dt><dd>Find candidates, Company jobs, Accounts, Settings</dd>
+            <dt><kbd>Ctrl</kbd> <kbd>Enter</kbd></dt><dd>Start the search from the form</dd>
+            <dt><kbd>Ctrl</kbd> <kbd>F</kbd></dt><dd>Search the results table</dd>
+            <dt><kbd>F5</kbd></dt><dd>Refresh the results table</dd>
+            <dt><kbd>Esc</kbd></dt><dd>Close a dialog or the break notice</dd>
+          </dl>
+        </div>
+
+        <div class="card about" id="about">
+          <svg class="about-mark" viewBox="0 0 32 32" aria-hidden="true">
+            <rect x="3" y="6" width="26" height="20" rx="5" fill="currentColor" opacity=".16" />
+            <rect x="3" y="6" width="26" height="20" rx="5" fill="none" stroke="currentColor" stroke-width="2" />
+            <circle cx="12" cy="14" r="3.2" fill="currentColor" />
+            <path d="M7 22c1-3 3-4.4 5-4.4s4 1.4 5 4.4" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+            <path d="M20 13h5M20 17h4" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+          </svg>
+          <div>
+            <h2>About Recruit Desk</h2>
+            <p class="about-version" id="about-version"></p>
+            <p class="update-row"><button type="button" id="update-check">Check for updates</button> <span class="hint" id="update-line" role="status"></span></p>
+            <p><strong>Built by kaustubh.s.v</strong></p>
+            <p class="muted">Three AI research assistants for recruiters: one finds candidates for a job, one checks a company's open jobs, and one researches a company as an account (what it builds, offices, funding, leaders and open engineering roles, each with a source). Results are saved to Excel files that this app shows but never changes.</p>
+            <details>
+              <summary>Technical details</summary>
+              <p class="hint" id="data-dir"></p>
+              <p class="hint">The allowance applies to this app only. Claude Code keeps its normal permission mode; each assistant's own settings decide what it may do.</p>
+            </details>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <dialog id="row-dialog" aria-labelledby="row-title">
+    <form method="dialog" class="dialog-head">
+      <h2 id="row-title"></h2>
+      <button value="close">Close</button>
+    </form>
+    <dl id="row-fields"></dl>
+  </dialog>
+
+  <dialog id="crm-dialog" class="confirm" aria-labelledby="crm-title" aria-describedby="crm-what">
+    <form method="dialog">
+      <h2 id="crm-title">Export for a CRM</h2>
+      <p id="crm-what" class="muted"></p>
+      <p class="muted">The file is saved in the assistant's exports folder, which opens when it is ready. Blank cells stay blank.</p>
+      <div class="actions">
+        <button value="hubspot" class="primary">HubSpot</button>
+        <button value="salesforce">Salesforce</button>
+        <button value="cancel" class="ghost">Cancel</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirm-dialog" class="confirm" aria-labelledby="confirm-title" aria-describedby="confirm-text">
+    <form method="dialog">
+      <h2 id="confirm-title"></h2>
+      <p id="confirm-text" class="muted"></p>
+      <div class="actions">
+        <button value="cancel" id="confirm-cancel" autofocus></button>
+        <button value="ok" class="danger" id="confirm-ok"></button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="palette" class="palette" aria-label="Quick actions">
+    <div class="palette-box">
+      <input id="palette-input" type="text" role="combobox" aria-expanded="true" aria-controls="palette-list" aria-autocomplete="list"
+        placeholder="Type an action, for example Excel or dark" autocomplete="off" spellcheck="false" />
+      <ul id="palette-list" role="listbox" aria-label="Actions"></ul>
+    </div>
+  </dialog>
+
+  <div id="toasts" class="toasts" aria-live="polite"></div>
+</body>
+</html>

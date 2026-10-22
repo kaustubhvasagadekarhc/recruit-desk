@@ -1,0 +1,20 @@
+{
+  "candidate": {
+    "counted": 0,
+    "cache_read": 0,
+    "locked_at": null,
+    "lock_elapsed_ms": 0,
+    "window_started": null,
+    "high_water": 1792061337299,
+    "clock_backwards": false
+  },
+  "company": {
+    "counted": 0,
+    "cache_read": 0,
+    "locked_at": null,
+    "lock_elapsed_ms": 0,
+    "window_started": null,
+    "high_water": 1792061337299,
+    "clock_backwards": false
+  }
+}
