@@ -85,17 +85,18 @@ and `prefers-reduced-motion` turns off every animation.
    "Skip, add later": the app's setup screen then asks for it. On a reinstall, leave the box empty to
    keep the key you saved before.
 4. Choose the app folder and install. Press Cancel on any page to leave without installing anything.
-   The installer also copies the two assistants (candidate-agent and company-agent, code and settings
+   The installer also copies the three assistants (candidate-agent, company-agent and account-agent, code and settings
    only) to `%USERPROFILE%\Documents\Recruit Desk\AI-AGENTS`, a folder you can write to, because the
-   assistants keep their workbooks and databases there. It then tries `uv sync` in each assistant so
-   the first run is fast; if that fails it is skipped and the setup screen offers "Prepare now".
+   assistants keep their databases and keys there. It also creates `%USERPROFILE%\Documents\RecruitDesk-Data` with one folder
+   per assistant (`Find candidates`, `Company jobs`, `Accounts`), where each assistant's Excel results are kept. It then tries
+   `uv sync` in each assistant so the first run is fast; if that fails it is skipped and the setup screen offers "Prepare now".
 5. On first start the app finds the assistants folder by itself and its setup screen checks the same
    things again, plus folder trust ("Trust both folders"), the Exa key and the prepared packages.
 
 **Upgrades and uninstall.** Installing a newer version replaces the assistants' code files only. Your
 `.env`, `memory.db`, the `.xlsx` workbooks and `runs/` are never in the installer, so they are never
-overwritten or deleted. Uninstalling removes the app but leaves the assistants folder in place (with
-your results and keys) and says so; delete it yourself if you no longer need it.
+overwritten or deleted. Uninstalling removes the app but leaves the assistants folder (with your databases and keys) and
+the results folder `Documents\RecruitDesk-Data` in place and says so; delete them yourself if you no longer need them.
 
 ## Sign-in
 
