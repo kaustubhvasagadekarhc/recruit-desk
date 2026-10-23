@@ -114,10 +114,14 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.cargo/bin
-          key: cargo-tools-tauri-cli-2.11.4
+          # Same key as the build job, so the tool the build job compiled is reused here.
+          key: cargo-tools-tauri-cli-2.11.4-cargo-xwin-0.23.1
       - name: Tauri CLI
         if: steps.cargo-tools.outputs.cache-hit != 'true'
-        run: cargo install tauri-cli --version 2.11.4 --locked
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pkg-config libssl-dev
+          cargo install tauri-cli --version 2.11.4 --locked
       - name: The update key must be set
         run: |
           if [ -z "$TAURI_SIGNING_PRIVATE_KEY" ]; then echo "Secret TAURI_SIGNING_PRIVATE_KEY is not set."; exit 1; fi
