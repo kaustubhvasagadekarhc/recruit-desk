@@ -60,7 +60,7 @@ Apply through the form on the SignPath Foundation website. Paste something like 
 
 ## Release from GitHub Actions (for SignPath)
 
-`.github/workflows/release.yml` builds the Windows installer and the Linux package on GitHub, sends the installer to SignPath, makes the update signature again over the signed file, runs `make-release.mjs --require-signed` and publishes the release. It runs when a `v*` tag is pushed or when started by hand (a hand start builds and signs but does not publish). It never runs on pull requests. The workflow has not been run yet; expect to fix small things on the first run.
+`.github/workflows/release.yml` builds the Windows installer and the Linux package on GitHub, sends the installer to SignPath, makes the update signature again over the signed file, runs `make-release.mjs --require-signed` and publishes the release. It runs when code is pushed to `main` (pushes that change only Markdown files, the licence or `.gitignore` are ignored) or when started by hand (a hand start builds and signs but does not publish). It publishes only when the version in `package.json` has no GitHub release yet, so raise the version (in `package.json`, `tauri.conf.json` and `Cargo.toml`) in the push that should ship; other pushes build and sign but publish nothing. It never runs on pull requests. The workflow has not been run yet; expect to fix small things on the first run.
 
 Set these in the repository under Settings, Secrets and variables, Actions:
 
