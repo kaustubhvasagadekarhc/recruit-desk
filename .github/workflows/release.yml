@@ -26,10 +26,10 @@ jobs:
       RECRUIT_DESK_AUTH_URL: ${{ secrets.RECRUIT_DESK_AUTH_URL }}
       TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
     steps:
+      - uses: actions/checkout@v4
       - name: The connection code must be set
         run: |
-          if [ -z "$RECRUIT_DESK_AUTH_URL" ]; then echo "Secret RECRUIT_DESK_AUTH_URL is not set, so the installer would have no sign-in."; exit 1; fi
-      - uses: actions/checkout@v4
+          case "$RECRUIT_DESK_AUTH_URL" in rd1.?*) ;; *) echo "Secret RECRUIT_DESK_AUTH_URL is missing or is not a connection code (it must start with rd1.)."; exit 1;; esac
       - uses: actions/setup-node@v4
         with:
           node-version: 22
