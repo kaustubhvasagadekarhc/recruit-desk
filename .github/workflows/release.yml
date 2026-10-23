@@ -1,0 +1,122 @@
+# Builds the Windows installer, has SignPath sign it, and publishes the release.
+# Needs the secrets and variables listed in desktop-app/SIGNING.md ("Release from GitHub Actions").
+# Runs only when a version tag is pushed or when started by hand; never on pull requests.
+name: release
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    defaults:
+      run:
+        working-directory: desktop-app
+    env:
+      RECRUIT_DESK_AUTH_URL: ${{ secrets.RECRUIT_DESK_AUTH_URL }}
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: x86_64-pc-windows-msvc
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: desktop-app/src-tauri
+      - name: System packages
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y nsis clang lld llvm libwebkit2gtk-4.1-dev libgtk-3-dev libayatana-appindicator3-dev librsvg2-dev libssl-dev patchelf
+      - name: Tauri CLI and cargo-xwin
+        run: cargo install tauri-cli@^2 cargo-xwin --locked
+      - run: npm ci || npm install
+      - name: Windows installer (unsigned)
+        working-directory: desktop-app/src-tauri
+        run: cargo tauri build --runner cargo-xwin --target x86_64-pc-windows-msvc
+      - name: Linux package
+        working-directory: desktop-app/src-tauri
+        run: cargo tauri build --bundles deb
+      - name: Keep the unsigned installer for SignPath
+        run: |
+          mkdir -p ../ci-unsigned
+          cp "src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/"*-setup.exe ../ci-unsigned/
+      - uses: actions/upload-artifact@v4
+        id: unsigned
+        with:
+          name: installer-unsigned
+          path: ci-unsigned/*.exe
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-package
+          path: desktop-app/src-tauri/target/release/bundle/deb/*.deb
+    outputs:
+      unsigned-artifact-id: ${{ steps.unsigned.outputs.artifact-id }}
+
+  sign:
+    needs: build
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
+          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
+          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
+          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
+          github-artifact-id: ${{ needs.build.outputs.unsigned-artifact-id }}
+          wait-for-completion: true
+          output-artifact-directory: signed
+      - uses: actions/upload-artifact@v4
+        with:
+          name: installer-signed
+          path: signed/*.exe
+
+  publish:
+    needs: sign
+    runs-on: ubuntu-24.04
+    if: startsWith(github.ref, 'refs/tags/v')
+    defaults:
+      run:
+        working-directory: desktop-app
+    env:
+      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+      TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo install tauri-cli@^2 --locked
+      - run: sudo apt-get update && sudo apt-get install -y osslsigncode
+      - uses: actions/download-artifact@v4
+        with:
+          name: installer-signed
+          path: desktop-app/ci-signed
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-package
+          path: desktop-app/ci-linux
+      - name: Put the signed files where make-release looks
+        run: |
+          v=$(node -p "require('./package.json').version")
+          nsis=src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis
+          deb=src-tauri/target/release/bundle/deb
+          mkdir -p "$nsis" "$deb"
+          cp ci-signed/*.exe "$nsis/Recruit Desk_${v}_x64-setup.exe"
+          cp ci-linux/*.deb "$deb/"
+          # Signing changes the installer, so the update signature is made again over the signed file.
+          (cd src-tauri && cargo tauri signer sign "../$nsis/Recruit Desk_${v}_x64-setup.exe")
+      - name: Release files
+        run: node scripts/make-release.mjs --require-signed --notes "Recruit Desk ${GITHUB_REF_NAME#v}"
+      - name: Publish
+        run: gh release create "$GITHUB_REF_NAME" release/* --title "Recruit Desk ${GITHUB_REF_NAME#v}" --notes "Recruit Desk ${GITHUB_REF_NAME#v}"

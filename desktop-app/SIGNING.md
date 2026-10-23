@@ -57,3 +57,20 @@ Apply through the form on the SignPath Foundation website. Paste something like 
 2. Build: `cargo tauri build --runner cargo-xwin --target x86_64-pc-windows-msvc`.
 3. `node scripts/make-release.mjs --require-signed` and `gh release create ...` as in `README.md` ("Releasing an update").
 4. Check on a Windows computer: right-click the installer, Properties, Digital Signatures.
+
+## Release from GitHub Actions (for SignPath)
+
+`.github/workflows/release.yml` builds the Windows installer and the Linux package on GitHub, sends the installer to SignPath, makes the update signature again over the signed file, runs `make-release.mjs --require-signed` and publishes the release. It runs when a `v*` tag is pushed or when started by hand (a hand start builds and signs but does not publish). It never runs on pull requests. The workflow has not been run yet; expect to fix small things on the first run.
+
+Set these in the repository under Settings, Secrets and variables, Actions:
+
+| Name | Kind | Value |
+|---|---|---|
+| `RECRUIT_DESK_AUTH_URL` | secret | the production connection code |
+| `TAURI_SIGNING_PRIVATE_KEY` | secret | contents of the update private key file |
+| `SIGNPATH_API_TOKEN` | secret | API token of a SignPath CI user |
+| `SIGNPATH_ORGANIZATION_ID` | variable | from the SignPath organisation page |
+| `SIGNPATH_PROJECT_SLUG` | variable | the project slug in SignPath |
+| `SIGNPATH_SIGNING_POLICY_SLUG` | variable | for example `release-signing` |
+
+Putting the connection code and the update key into GitHub secrets means GitHub holds them, and anyone who can push a tag to the repository can run the workflow. Keep write access to the repository small. SignPath also needs an artifact configuration that signs the installer `.exe` with Authenticode; their onboarding explains it. Only the installer is signed this way; the programs inside it are not signed separately.
