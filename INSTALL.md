@@ -13,6 +13,11 @@ Recruit Desk is a desktop app that runs three AI research assistants (Find candi
 
 Run `Recruit-Desk-<version>-Setup.exe`. It installs for the current user only and needs no administrator rights. The installer is not code-signed, so Windows SmartScreen may warn the first time: choose "More info", then "Run anyway".
 
+**If your browser or Windows warns about the file.** The installer is not code-signed yet, so you may see "... isn't commonly downloaded" (the browser) and then "Windows protected your PC" (SmartScreen). This is a reputation warning for new, unsigned files, not a finding that the file is harmful. To continue:
+1. In the browser's download list choose **Keep** (in Edge, "..." then Keep, then "Keep anyway"; in Chrome, the arrow then Keep).
+2. Open the file. On the blue SmartScreen screen choose **More info**, then **Run anyway**.
+3. If you want to check the file first, compare its SHA-256 with the one in the release notes of that version (`Get-FileHash .\Recruit-Desk_<version>_x64-setup.exe -Algorithm SHA256` in PowerShell), and download only from this repository's Releases page.
+
 The wizard goes through these pages:
 
 1. **Welcome** and the licence.
