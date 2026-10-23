@@ -130,7 +130,17 @@ def main() -> None:
 
     # Step 4: dedupe + memory
     progress.start(4)
-    final_file = run_step("dedupe.py", files).get("FINAL_FILE")
+    dedupe_keys = run_step("dedupe.py", files)
+    final_file = dedupe_keys.get("FINAL_FILE")
+    if not final_file and dedupe_keys.get("NO_ROWS"):
+        # No roles found and nothing to close: the Excel file now exists, there is nothing to write into it.
+        progress.result("skipped: no roles found, nothing to write", 5)
+        print("")
+        print(f"SUMMARY {a.company} ({a.domain}), {round(time.time() - t0)}s total")
+        print(f"  scan: {scan_meta.get('crawl_mode', '?')} crawl, {scan_meta.get('pages_fetched', '?')} pages, {scan_meta.get('seconds', '?')}s")
+        print(f"  careers page: {scan_meta.get('careers_page') or 'not found'}")
+        print("  jobs: 0 (no roles found; the Excel file is ready for the next run)")
+        return
     if not final_file:
         progress.fail_exit("dedupe.py printed no FINAL_FILE")
     fmeta = json.loads((ROOT / final_file).read_text())

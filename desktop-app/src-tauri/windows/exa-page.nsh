@@ -114,13 +114,16 @@ Function RD_UvSync
   ${ForEach} $R8 1 3 + 1
     ${If} $R8 == 1
       StrCpy $R0 "$RD_AgentsDir\candidate-agent"
+      StrCpy $R9 "$DOCUMENTS\RecruitDesk-Data\Find candidates"
     ${ElseIf} $R8 == 2
       StrCpy $R0 "$RD_AgentsDir\company-agent"
+      StrCpy $R9 "$DOCUMENTS\RecruitDesk-Data\Company jobs"
     ${Else}
       StrCpy $R0 "$RD_AgentsDir\account-agent"
+      StrCpy $R9 "$DOCUMENTS\RecruitDesk-Data\Accounts"
     ${EndIf}
-    DetailPrint "Preparing $R0 (uv sync; this can take a few minutes)..."
-    nsExec::ExecToStack /TIMEOUT=${RD_UV_TIMEOUT} '"$R7" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$PLUGINSDIR\rd-agents.ps1" -Dir "$R0"'
+    DetailPrint "Preparing $R0 (uv sync and the empty Excel file; this can take a few minutes)..."
+    nsExec::ExecToStack /TIMEOUT=${RD_UV_TIMEOUT} '"$R7" -NoProfile -NonInteractive -ExecutionPolicy Bypass -File "$PLUGINSDIR\rd-agents.ps1" -Dir "$R0" -WorkbookDir "$R9"'
     Pop $0
     Pop $1
     ${If} $0 != 0
