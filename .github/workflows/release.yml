@@ -24,7 +24,6 @@ jobs:
         working-directory: desktop-app
     env:
       RECRUIT_DESK_AUTH_URL: ${{ secrets.RECRUIT_DESK_AUTH_URL }}
-      TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
       TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
     steps:
       - uses: actions/checkout@v4
@@ -53,6 +52,13 @@ jobs:
         if: steps.cargo-tools.outputs.cache-hit != 'true'
         run: cargo install tauri-cli --version 2.11.4 --locked && cargo install cargo-xwin --version 0.23.1 --locked
       - run: npm ci || npm install
+      # The build only needs some update key to finish. The real update key stays in the publish job, which makes the
+      # update signature again over the SignPath-signed installer, so the build job never sees it.
+      - name: Throwaway update key for the build
+        working-directory: desktop-app/src-tauri
+        run: |
+          cargo tauri signer generate --ci --password "" --write-keys "$RUNNER_TEMP/throwaway.key"
+          echo "TAURI_SIGNING_PRIVATE_KEY=$RUNNER_TEMP/throwaway.key" >> "$GITHUB_ENV"
       - name: Windows installer (unsigned)
         working-directory: desktop-app/src-tauri
         run: cargo tauri build --runner cargo-xwin --target x86_64-pc-windows-msvc
