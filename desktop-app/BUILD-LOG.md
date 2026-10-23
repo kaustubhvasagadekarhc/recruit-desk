@@ -511,3 +511,12 @@ Temp worker-desktop-ux. Goal: make the app easy for a non-technical recruiter, a
 - Human request: no release must ever go out without a release description. The published 0.1.6 had only the title as its text.
 - `release-notes/<version>.md` holds each release's description. The release workflow fails in its first seconds when the file for the version in `package.json` is missing or shorter than 80 characters, and the publish step uses it as the release text. `make-release.mjs` refuses `--notes` shorter than 80 characters, so a local release is covered too.
 - Wrote `release-notes/0.1.6.md` and put it on the published v0.1.6 release.
+
+## 0.1.7: the Excel file is created at install and at every run (2026-10-23)
+
+- Human request: during installation the app must create the Excel sheet automatically, and agent runs must create and update records in it. The company assistant also created nothing when a scan found no roles (its dedupe step stopped with "no rows"), so no file or record existed.
+- Each assistant has `scripts/init_workbook.py`: creates its Excel file (and the folder) when it does not exist, with the starting sheets and headers (Companies and Jobs for company-agent, Evidence for candidate-agent, Accounts and Evidence for account-agent), through a temporary file, and never touches an existing file. `memory.py init`, the first command of every run, calls it, so the file exists before the first search (also on Linux and after a deleted file).
+- Installer: `rd-agents.ps1` takes `-WorkbookDir` and runs the script after `uv sync`; `exa-page.nsh` passes `Documents\RecruitDesk-Data\<assistant>`. A failure here is ignored (the first run creates the file).
+- company-agent: a scan with no roles and nothing to close is a normal finish, not a failure. `dedupe.py` and `excel_upsert.py` create the file if needed and report "no roles found, nothing to add"; `run_company.py` ends with a short summary and marks step 5 skipped.
+- Tests: new `test_init_workbook.py` in each assistant (created in a missing folder, starting sheets, header rows, second run leaves the file alone, and for company zero rows exit 0); the company suites (improvements, last_record, posted_dates, typed_fields, entities, scan_quality) pass; `cargo test --lib installer` 8/8.
+- Not tested: the real Windows installer run (the PowerShell and NSIS change was checked by the installer tests and by reading, not by running a Windows install).

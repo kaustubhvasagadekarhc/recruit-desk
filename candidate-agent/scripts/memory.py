@@ -287,6 +287,11 @@ def main() -> None:
     con = connect()
     out: object
     if a.cmd == "init":
+        try:   # the Excel file exists before the first search; an existing file is never touched
+            import init_workbook
+            init_workbook.ensure()
+        except Exception as e:  # a missing file is made again by the upsert, so this must never stop a run
+            print(f"note: could not prepare the Excel file yet ({e})", file=sys.stderr)
         out = {"db": str(DB_PATH), "ok": True}
     elif a.cmd == "add-jd":
         jd = json.loads(open(a.file).read())

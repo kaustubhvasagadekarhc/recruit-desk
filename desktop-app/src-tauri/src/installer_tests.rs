@@ -131,4 +131,5 @@ fn agents_install_to_documents_and_user_data_is_never_removed() {
     assert!(HOOKS.contains("NSIS_HOOK_POSTINSTALL") && HOOKS.contains("NSIS_HOOK_POSTUNINSTALL"));
     assert!(HOOKS.contains("left in place"));
     assert!(AGENTS_PS.is_ascii() && AGENTS_PS.contains("sync"));
+    assert!(AGENTS_PS.contains("init_workbook.py") && AGENTS_PS.contains("WorkbookDir"), "the installer creates the empty Excel file");
 }

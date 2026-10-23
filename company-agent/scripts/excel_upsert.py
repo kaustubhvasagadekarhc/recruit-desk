@@ -86,9 +86,13 @@ def main() -> None:
     if errs:
         progress.fail_exit("refusing to write invalid rows:\n" + "\n".join(errs[:30]))
     rows = load_rows(payload)
-    if not rows:
-        progress.fail_exit("no rows to write")
     wbp = Path(a.workbook)
+    if not rows:
+        # Nothing to add is not a failure; the file is still made when it does not exist yet.
+        import init_workbook
+        made = init_workbook.ensure(wbp)
+        progress.result("no roles to write" + ("; the Excel file was created" if made else "; the Excel file is unchanged"))
+        return
     lock = wbp.with_name("~$" + wbp.name)
     if lock.exists():
         progress.fail_exit(f"{wbp.name} looks open in Excel ({lock.name} exists); close it and rerun")

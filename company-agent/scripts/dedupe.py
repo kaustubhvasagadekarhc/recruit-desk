@@ -97,7 +97,12 @@ def main(paths: list[str]) -> None:
         metas.append(payload.get("meta", {}) if isinstance(payload, dict) else {})
         rows.extend(payload["rows"] if isinstance(payload, dict) else payload)
     if not rows and not any(m.get("complete_sources") for m in metas):
-        progress.fail_exit("no rows")
+        # Nothing was found and nothing can be proven closed: not a failure. The Excel file is still made so it exists for the next run.
+        import init_workbook
+        made = init_workbook.ensure()
+        progress.result("no roles found, nothing to add" + ("; the Excel file was created" if made else "; the Excel file is unchanged"))
+        print("NO_ROWS=1")
+        return
     company = next((m.get("company") for m in metas if m.get("company")), rows[0]["Company Name"] if rows else "")
     domain = next((m.get("domain") for m in metas if m.get("domain")), "")
     con = memory.connect()

@@ -238,6 +238,11 @@ def _main() -> None:
             print(f"{len(rows)} on the watchlist")
         return
     if a.cmd == "init":
+        try:   # the Excel file exists before the first search; an existing file is never touched
+            import init_workbook
+            init_workbook.ensure()
+        except Exception as e:  # a missing file is made again by the upsert, so this must never stop a run
+            print(f"note: could not prepare the Excel file yet ({e})", file=sys.stderr)
         print(f"memory ready: {DB_PATH}")
     elif a.cmd == "stats":
         for t in ("companies", "company_aliases", "routes", "jobs", "rejected_sources", "runs"):
