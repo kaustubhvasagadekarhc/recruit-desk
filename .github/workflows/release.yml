@@ -29,7 +29,18 @@ jobs:
       - uses: actions/checkout@v4
       - name: The connection code must be set
         run: |
-          case "$RECRUIT_DESK_AUTH_URL" in rd1.?*) ;; *) echo "Secret RECRUIT_DESK_AUTH_URL is missing or is not a connection code (it must start with rd1.)."; exit 1;; esac
+          python3 - <<'PY'
+          import base64, json, os, sys
+          code = os.environ.get("RECRUIT_DESK_AUTH_URL", "")
+          try:
+              assert code.startswith("rd1.")
+              body = code[4:]
+              d = json.loads(base64.urlsafe_b64decode(body + "=" * (-len(body) % 4)))
+              assert all(str(d[k]).startswith("https://") for k in ("a", "r", "o"))
+          except Exception:
+              sys.exit("Secret RECRUIT_DESK_AUTH_URL is missing or is not a valid connection code (made by operator.py connection-code).")
+          print("connection code looks valid")
+          PY
       - uses: actions/setup-node@v4
         with:
           node-version: 22
