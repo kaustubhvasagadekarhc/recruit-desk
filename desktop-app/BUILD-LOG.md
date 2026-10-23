@@ -499,3 +499,9 @@ Temp worker-desktop-ux. Goal: make the app easy for a non-technical recruiter, a
 - `SIGNING.md`: why the warning appears, the options (SignPath Foundation, Azure Artifact Signing, a CA certificate), a ready SignPath application text, and the steps once a certificate exists.
 - Tested with a throwaway self-signed certificate: the installer, `recruit-desk.exe`, `headless.exe` and the NSIS plug-ins came out signed with a verified timestamp; `--require-signed` passed on it and fails on the published unsigned 0.1.5 installer. A self-signed certificate is not trusted by Windows, so this proves the pipeline only. The test output was deleted and never published.
 - Windows keeps showing "Unknown publisher" until a real certificate is configured.
+
+## 0.1.6: Node.js hint without winget; release pipeline (2026-10-23)
+
+- Installer: the hand-run hint for Node.js no longer names winget (the install button already falls back to the nodejs.org installer); it says to download the LTS installer from nodejs.org.
+- Release pipeline: `.github/workflows/release.yml` runs on pushes to `main` (Markdown-only pushes ignored), builds the Windows installer and the `.deb`, has SignPath sign the installer, makes the update signature again over the signed file, checks it with `make-release.mjs --require-signed` and publishes the release for the version in `package.json` when that version has no release yet. It needs the secrets and variables listed in `SIGNING.md`; until they exist the run fails at the build or signing step.
+- Version raised to 0.1.6 in `package.json`, `tauri.conf.json`, `Cargo.toml` and `Cargo.lock`.
