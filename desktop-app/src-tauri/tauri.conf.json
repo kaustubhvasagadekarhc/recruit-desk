@@ -40,6 +40,13 @@
         "installMode": "currentUser",
         "template": "windows/installer.nsi",
         "installerHooks": "windows/hooks.nsh"
+      },
+      "signCommand": {
+        "cmd": "bash",
+        "args": [
+          "../scripts/sign-windows.sh",
+          "%1"
+        ]
       }
     },
     "publisher": "kaustubh.s.v",

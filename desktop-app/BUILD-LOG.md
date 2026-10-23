@@ -489,3 +489,13 @@ Temp worker-desktop-ux. Goal: make the app easy for a non-technical recruiter, a
 - **Asked:** "by default keep the light theme". The app used to follow the computer's setting, so a dark computer showed it dark. Now it starts light on every computer: the page itself starts with `data-theme="light"` (no dark flash before the script runs) and a new storage key `theme-v2` holds the person's own choice. Settings > Appearance still offers Light, Dark and Match my computer. Earlier installs: an old "dark" is kept (it could only have been chosen on purpose), an old "match my computer" (which was just the default) or "light" becomes light.
 - **Tests:** new suite theme 9/9 (first start light on a dark and on a light computer, old choices, choosing each option); admin 80, logs 22, history 64, signin 42, link 66, allowance 44, records 74 (the dark runs of every suite now set the theme explicitly); `cargo test --lib` 152; `test:ui` passes. Not checked: the Windows window.
 - **Installers (0.1.5):** Windows sha256 eddba15ea240f235baed9c0e764f3ffe90799c25ada5124d5f403535ce05503a; Linux sha256 0a7178e33aaf792aa121d34e4765ec45fabe245d6f137b8a33c4f634642bc8d7; check-installer passed.
+
+## Windows code-signing pipeline (2026-10-23)
+
+- Human request: the installer shows "not commonly downloaded" in the browser and "Unknown publisher" in Windows, "fix this".
+- Cause: the installer has no Authenticode signature. Only a code-signing certificate issued by a trusted authority removes the warning; code cannot. This change makes the certificate the only missing piece.
+- `scripts/sign-windows.sh`, wired in as `bundle.windows.signCommand`: signs every Windows file Tauri produces. It does nothing when no signer is configured. `RECRUIT_DESK_SIGN_COMMAND` (any signer, file as `$1`) or `RECRUIT_DESK_SIGN_PFX` + `RECRUIT_DESK_SIGN_PFX_PASSWORD` (osslsigncode, DigiCert timestamp by default). A configured signer that fails fails the build.
+- `scripts/make-release.mjs --require-signed`: refuses to write `release/` when the installer carries no signature (checked with `osslsigncode extract-signature`).
+- `SIGNING.md`: why the warning appears, the options (SignPath Foundation, Azure Artifact Signing, a CA certificate), a ready SignPath application text, and the steps once a certificate exists.
+- Tested with a throwaway self-signed certificate: the installer, `recruit-desk.exe`, `headless.exe` and the NSIS plug-ins came out signed with a verified timestamp; `--require-signed` passed on it and fails on the published unsigned 0.1.5 installer. A self-signed certificate is not trusted by Windows, so this proves the pipeline only. The test output was deleted and never published.
+- Windows keeps showing "Unknown publisher" until a real certificate is configured.
