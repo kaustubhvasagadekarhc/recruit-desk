@@ -1,5 +1,5 @@
-# Builds the Windows installer, has SignPath sign it, and publishes the release.
-# Needs the secrets and variables listed in desktop-app/SIGNING.md ("Release from GitHub Actions").
+# Builds the Windows installer and the Linux package and publishes the release. The Windows installer is not code-signed (see desktop-app/SIGNING.md).
+# Needs the repository secrets RECRUIT_DESK_AUTH_URL (the connection code) and TAURI_SIGNING_PRIVATE_KEY (the update key).
 # Runs when code is pushed to main (documentation-only pushes are ignored) or when started by hand; never on pull requests.
 # A release is published only for a version that has no release yet: raise the version in package.json, tauri.conf.json and Cargo.toml to ship.
 name: release
@@ -26,6 +26,9 @@ jobs:
       RECRUIT_DESK_AUTH_URL: ${{ secrets.RECRUIT_DESK_AUTH_URL }}
       TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
     steps:
+      - name: The connection code must be set
+        run: |
+          if [ -z "$RECRUIT_DESK_AUTH_URL" ]; then echo "Secret RECRUIT_DESK_AUTH_URL is not set, so the installer would have no sign-in."; exit 1; fi
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
@@ -53,7 +56,7 @@ jobs:
         run: cargo install tauri-cli --version 2.11.4 --locked && cargo install cargo-xwin --version 0.23.1 --locked
       - run: npm ci || npm install
       # The build only needs some update key to finish. The real update key stays in the publish job, which makes the
-      # update signature again over the SignPath-signed installer, so the build job never sees it.
+      # update signature again, so the build job never sees it.
       - name: Throwaway update key for the build
         working-directory: desktop-app/src-tauri
         run: |
@@ -65,12 +68,11 @@ jobs:
       - name: Linux package
         working-directory: desktop-app/src-tauri
         run: cargo tauri build --bundles deb
-      - name: Keep the unsigned installer for SignPath
+      - name: Keep the installer for the publish job
         run: |
           mkdir -p ../ci-unsigned
           cp "src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis/"*-setup.exe ../ci-unsigned/
       - uses: actions/upload-artifact@v4
-        id: unsigned
         with:
           name: installer-unsigned
           path: ci-unsigned/*.exe
@@ -78,29 +80,9 @@ jobs:
         with:
           name: linux-package
           path: desktop-app/src-tauri/target/release/bundle/deb/*.deb
-    outputs:
-      unsigned-artifact-id: ${{ steps.unsigned.outputs.artifact-id }}
-
-  sign:
-    needs: build
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: signpath/github-action-submit-signing-request@v1
-        with:
-          api-token: ${{ secrets.SIGNPATH_API_TOKEN }}
-          organization-id: ${{ vars.SIGNPATH_ORGANIZATION_ID }}
-          project-slug: ${{ vars.SIGNPATH_PROJECT_SLUG }}
-          signing-policy-slug: ${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}
-          github-artifact-id: ${{ needs.build.outputs.unsigned-artifact-id }}
-          wait-for-completion: true
-          output-artifact-directory: signed
-      - uses: actions/upload-artifact@v4
-        with:
-          name: installer-signed
-          path: signed/*.exe
 
   publish:
-    needs: sign
+    needs: build
     runs-on: ubuntu-24.04
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     defaults:
@@ -116,12 +98,22 @@ jobs:
         with:
           node-version: 22
       - uses: dtolnay/rust-toolchain@stable
-      - run: cargo install tauri-cli --version 2.11.4 --locked
-      - run: sudo apt-get update && sudo apt-get install -y osslsigncode
+      - name: Cache cargo tools
+        id: cargo-tools
+        uses: actions/cache@v4
+        with:
+          path: ~/.cargo/bin
+          key: cargo-tools-tauri-cli-2.11.4
+      - name: Tauri CLI
+        if: steps.cargo-tools.outputs.cache-hit != 'true'
+        run: cargo install tauri-cli --version 2.11.4 --locked
+      - name: The update key must be set
+        run: |
+          if [ -z "$TAURI_SIGNING_PRIVATE_KEY" ]; then echo "Secret TAURI_SIGNING_PRIVATE_KEY is not set."; exit 1; fi
       - uses: actions/download-artifact@v4
         with:
-          name: installer-signed
-          path: desktop-app/ci-signed
+          name: installer-unsigned
+          path: desktop-app/ci-win
       - uses: actions/download-artifact@v4
         with:
           name: linux-package
@@ -137,20 +129,20 @@ jobs:
           else
             echo "new=true" >> "$GITHUB_OUTPUT"
           fi
-      - name: Put the signed files where make-release looks
+      - name: Put the installer where make-release looks
         if: steps.version.outputs.new == 'true'
         run: |
           v=$(node -p "require('./package.json').version")
           nsis=src-tauri/target/x86_64-pc-windows-msvc/release/bundle/nsis
           deb=src-tauri/target/release/bundle/deb
           mkdir -p "$nsis" "$deb"
-          cp ci-signed/*.exe "$nsis/Recruit Desk_${v}_x64-setup.exe"
+          cp ci-win/*.exe "$nsis/Recruit Desk_${v}_x64-setup.exe"
           cp ci-linux/*.deb "$deb/"
-          # Signing changes the installer, so the update signature is made again over the signed file.
+          # The build used a throwaway update key, so the update signature is made here with the real one.
           (cd src-tauri && cargo tauri signer sign "../$nsis/Recruit Desk_${v}_x64-setup.exe")
       - name: Release files
         if: steps.version.outputs.new == 'true'
-        run: node scripts/make-release.mjs --require-signed --notes "Recruit Desk ${{ steps.version.outputs.v }}"
+        run: node scripts/make-release.mjs --notes "Recruit Desk ${{ steps.version.outputs.v }}"
       - name: Publish
         if: steps.version.outputs.new == 'true'
         run: gh release create "v${{ steps.version.outputs.v }}" release/* --target "$GITHUB_SHA" --title "Recruit Desk ${{ steps.version.outputs.v }}" --notes "Recruit Desk ${{ steps.version.outputs.v }}"
