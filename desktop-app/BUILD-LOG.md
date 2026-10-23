@@ -505,3 +505,9 @@ Temp worker-desktop-ux. Goal: make the app easy for a non-technical recruiter, a
 - Installer: the hand-run hint for Node.js no longer names winget (the install button already falls back to the nodejs.org installer); it says to download the LTS installer from nodejs.org.
 - Release pipeline: `.github/workflows/release.yml` runs on pushes to `main` (Markdown-only pushes ignored), builds the Windows installer and the `.deb`, has SignPath sign the installer, makes the update signature again over the signed file, checks it with `make-release.mjs --require-signed` and publishes the release for the version in `package.json` when that version has no release yet. It needs the secrets and variables listed in `SIGNING.md`; until they exist the run fails at the build or signing step.
 - Version raised to 0.1.6 in `package.json`, `tauri.conf.json`, `Cargo.toml` and `Cargo.lock`.
+
+## Release descriptions are required (2026-10-23)
+
+- Human request: no release must ever go out without a release description. The published 0.1.6 had only the title as its text.
+- `release-notes/<version>.md` holds each release's description. The release workflow fails in its first seconds when the file for the version in `package.json` is missing or shorter than 80 characters, and the publish step uses it as the release text. `make-release.mjs` refuses `--notes` shorter than 80 characters, so a local release is covered too.
+- Wrote `release-notes/0.1.6.md` and put it on the published v0.1.6 release.

@@ -16,7 +16,9 @@ const conf = JSON.parse(fs.readFileSync(path.join(root, "src-tauri", "tauri.conf
 const endpoint = conf.plugins?.updater?.endpoints?.[0] ?? "";
 const repo = arg("--repo", (/github\.com\/([^/]+\/[^/]+)\//.exec(endpoint) ?? [])[1]);
 if (!repo) throw new Error("No repository: pass --repo owner/name or set the updater endpoint in tauri.conf.json");
-const notes = arg("--notes", `Recruit Desk ${version}`);
+const notes = arg("--notes", "");
+// Every release needs a real description (what changed, how to install, known limits); latest.json carries it to the updater.
+if (notes.trim().length < 80) throw new Error("Give the release a real description: --notes \"$(cat release-notes/<version>.md)\" (at least 80 characters).");
 const requireSigned = process.argv.includes("--require-signed");
 
 const nsis = path.join(root, "src-tauri", "target", "x86_64-pc-windows-msvc", "release", "bundle", "nsis");

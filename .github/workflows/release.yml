@@ -41,6 +41,14 @@ jobs:
               sys.exit("Secret RECRUIT_DESK_AUTH_URL is missing or is not a valid connection code (made by operator.py connection-code).")
           print("connection code looks valid")
           PY
+      - name: A release description must exist
+        run: |
+          v=$(node -p "require('./package.json').version")
+          f="release-notes/$v.md"
+          if [ ! -s "$f" ] || [ "$(wc -c < "$f")" -lt 80 ]; then
+            echo "No release description for version $v: write desktop-app/$f (what changed, how to install, known limits) before releasing."
+            exit 1
+          fi
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -157,7 +165,7 @@ jobs:
           (cd src-tauri && cargo tauri signer sign "../$nsis/Recruit Desk_${v}_x64-setup.exe")
       - name: Release files
         if: steps.version.outputs.new == 'true'
-        run: node scripts/make-release.mjs --notes "Recruit Desk ${{ steps.version.outputs.v }}"
+        run: node scripts/make-release.mjs --notes "$(cat release-notes/${{ steps.version.outputs.v }}.md)"
       - name: Publish
         if: steps.version.outputs.new == 'true'
-        run: gh release create "v${{ steps.version.outputs.v }}" release/* --target "$GITHUB_SHA" --title "Recruit Desk ${{ steps.version.outputs.v }}" --notes "Recruit Desk ${{ steps.version.outputs.v }}"
+        run: gh release create "v${{ steps.version.outputs.v }}" release/* --target "$GITHUB_SHA" --title "Recruit Desk ${{ steps.version.outputs.v }}" --notes-file "release-notes/${{ steps.version.outputs.v }}.md"
