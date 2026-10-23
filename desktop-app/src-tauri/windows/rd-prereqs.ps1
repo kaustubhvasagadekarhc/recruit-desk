@@ -17,7 +17,7 @@ $ProgressPreference = 'SilentlyContinue'
 try { [Net.ServicePointManager]::SecurityProtocol = [Net.ServicePointManager]::SecurityProtocol -bor [Net.SecurityProtocolType]::Tls12 } catch {}
 
 $Manual = @{
-    node   = 'winget install -e --id OpenJS.NodeJS.LTS   (or download the LTS installer from https://nodejs.org)'
+    node   = 'Download the LTS installer from https://nodejs.org and run it (winget is not needed)'
     claude = 'npm install -g @anthropic-ai/claude-code   (or: irm https://claude.ai/install.ps1 | iex)'
     login  = 'claude   (then sign in in the browser)'
     uv     = 'powershell -ExecutionPolicy ByPass -c "irm https://astral.sh/uv/install.ps1 | iex"'

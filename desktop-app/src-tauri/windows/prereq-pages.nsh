@@ -204,7 +204,7 @@ FunctionEnd
 !insertmacro RD_PREREQ_PAGE node "Step 1 of 4: Node.js and npm" \
   "Recruit Desk uses Node.js and npm to install Claude Code. The installer checks that $\"node -v$\" and $\"npm -v$\" work." \
   "Install Node.js LTS" \
-  "winget install -e --id OpenJS.NodeJS.LTS"
+  "Download the LTS installer from https://nodejs.org, run it, then press Check again (no winget needed)"
 !insertmacro RD_PREREQ_PAGE claude "Step 2 of 4: Claude Code" \
   "The AI assistants run inside Claude Code. The installer checks that $\"claude --version$\" works." \
   "Install Claude Code" \
