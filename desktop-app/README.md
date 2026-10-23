@@ -221,8 +221,8 @@ The update key pair is made once with `cargo tauri signer generate -w ~/.tauri/r
 2. Build signed, with the production connection code inside (see `neon-backend/README.md` for the code):
    `export RECRUIT_DESK_AUTH_URL=<code> TAURI_SIGNING_PRIVATE_KEY="$(cat ~/.tauri/recruit-desk-updater.key)" TAURI_SIGNING_PRIVATE_KEY_PASSWORD=""`
    then `cargo tauri build --runner cargo-xwin --target x86_64-pc-windows-msvc` and `cargo tauri build --bundles deb` in `src-tauri/`.
-3. `node scripts/make-release.mjs --notes "What changed."` writes `release/` (installer, its `.sig`, the `.deb`, `latest.json`). Once the Windows installer is code-signed (see [`SIGNING.md`](SIGNING.md)), add `--require-signed` so an unsigned installer is never published.
-4. `git tag -a vX.Y.Z -m "..."`, push the tag, then `gh release create vX.Y.Z release/* --title "Recruit Desk X.Y.Z" --notes "What changed."`. The release must not be a draft or a pre-release: installed copies read `https://github.com/kaustubhvasagadekarhc/recruit-desk/releases/latest/download/latest.json`, which works for a public repository only.
+3. Write the release description in `release-notes/<version>.md` (what changed, how to install, known limits). No release goes out without one: the workflow and `make-release.mjs` both refuse. Then `node scripts/make-release.mjs --notes "$(cat release-notes/<version>.md)"` writes `release/` (installer, its `.sig`, the `.deb`, `latest.json`). Once the Windows installer is code-signed (see [`SIGNING.md`](SIGNING.md)), add `--require-signed` so an unsigned installer is never published.
+4. `git tag -a vX.Y.Z -m "..."`, push the tag, then `gh release create vX.Y.Z release/* --title "Recruit Desk X.Y.Z" --notes-file release-notes/X.Y.Z.md`. The release must not be a draft or a pre-release: installed copies read `https://github.com/kaustubhvasagadekarhc/recruit-desk/releases/latest/download/latest.json`, which works for a public repository only.
 5. Apply any new `neon-backend/setup.sql` first (`operator.py setup`), so updated copies find the database ready.
 
 ## Files
